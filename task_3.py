@@ -1,5 +1,6 @@
+import sys
 import numpy as np
-import cv2 as cv
+import cv2
 
 KERNEL_DERIVATIVE_X = np.array([
     [1, 0, -1],
@@ -45,10 +46,10 @@ def sobel(image):
     gradient_direction = np.arctan2(dy, dx)
     gradient_direction_display = normalise(gradient_direction)
 
-    cv.imwrite("dx_display.jpg", dx_display)
-    cv.imwrite("dy_display.jpg", dy_display)
-    cv.imwrite("gradient_magnitude.jpg", gradient_magnitude_display)
-    cv.imwrite("gradient_direction.jpg", gradient_direction_display)
+    cv2.imwrite("task3/dx_display.jpg", dx_display)
+    cv2.imwrite("task3/dy_display.jpg", dy_display)
+    cv2.imwrite("task3/gradient_magnitude.jpg", gradient_magnitude_display)
+    cv2.imwrite("task3/gradient_direction.jpg", gradient_direction_display)
 
     return gradient_magnitude, gradient_direction
 
@@ -86,17 +87,16 @@ def display_hough_space(hough_space):
     summed_hough_space = np.sum(hough_space, axis = 2)
     summed_hough_space_display = normalise(summed_hough_space)
     return summed_hough_space_display
-    
 
 def main():
-    image = cv.imread("coins2.png")
-    image_grey = cv.cvtColor(src = image, code = cv.COLOR_BGR2GRAY)
+    image = cv2.imread(".png")
+    image_grey = cv2.cvtColor(src = image, code = cv.COLOR_BGR2GRAY)
 
     gradient_magnitude, gradient_direction = sobel(image_grey)
 
     hough_space = hough(gradient_magnitude, gradient_direction,)
     hough_space_display = display_hough_space(hough_space)
-    cv.imwrite("summed_hough_space.jpg", hough_space_display)
+    cv2.imwrite("task_3/summed_hough_space.jpg", hough_space_display)
 
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
@@ -110,9 +110,9 @@ def main():
                     print(hough_space[x][y][r])
                     cv.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
-    cv.imshow("Display window", image)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    cv2.imshow("Display window", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()

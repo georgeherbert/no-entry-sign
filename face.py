@@ -17,8 +17,9 @@ def detect_and_display(frame, cascade):
     print(len(faces))
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    cv2.imshow("", frame)
+    cv2.imshow("Display window", frame)
     cv2.waitKey()
+    cv2.destroyAllWindows()
     
 def main():
     frame = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
