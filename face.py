@@ -23,9 +23,9 @@ def detect_and_display(frame, cascade):
 def main():
     frame = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
     
-    cascade = cv2.CascadeClassifier("files_provided/frontalface.xml")
-    # cascade.load()
-    
+    cascade = cv2.CascadeClassifier("files_provided/Noentrycascade/frontalface.xml")
+    # cascade = cv2.CascadeClassifier("files_provided/Noentrycascade/cascade.xml")
+
     detect_and_display(frame, cascade)
     
 if __name__ == "__main__":
