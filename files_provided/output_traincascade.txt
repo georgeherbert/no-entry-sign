@@ -1,0 +1,66 @@
+bash-4.2$ ./opencv_traincascade -data NoEntrycascade -vec no_entry.vec -bg negatives.dat -numPos 500 -numNeg 500 -numStages 3 -maxDepth 1 -w 20 -h 20 -minHitRate 0.999 -maxFalseAlarmRate 0.05 -mode ALL
+PARAMETERS:
+cascadeDirName: NoEntrycascade
+vecFileName: no_entry.vec
+bgFileName: negatives.dat
+numPos: 500
+numNeg: 500
+numStages: 3
+precalcValBufSize[Mb] : 256
+precalcIdxBufSize[Mb] : 256
+stageType: BOOST
+featureType: HAAR
+sampleWidth: 20
+sampleHeight: 20
+boostType: GAB
+minHitRate: 0.999
+maxFalseAlarmRate: 0.05
+weightTrimRate: 0.95
+maxDepth: 1
+maxWeakCount: 100
+mode: ALL
+
+===== TRAINING 0-stage =====
+<BEGIN
+POS count : consumed   500 : 500
+NEG count : acceptanceRatio    500 : 1
+Precalculation time: 7
++----+---------+---------+
+|  N |    HR   |    FA   |
++----+---------+---------+
+|   1|        1|        0|
++----+---------+---------+
+END>
+
+===== TRAINING 1-stage =====
+<BEGIN
+POS count : consumed   500 : 500
+NEG count : acceptanceRatio    500 : 0.0163356
+Precalculation time: 6
++----+---------+---------+
+|  N |    HR   |    FA   |
++----+---------+---------+
+|   1|        1|        1|
++----+---------+---------+
+|   2|        1|    0.114|
++----+---------+---------+
+|   3|        1|     0.02|
++----+---------+---------+
+END>
+
+===== TRAINING 2-stage =====
+<BEGIN
+POS count : consumed   500 : 500
+NEG count : acceptanceRatio    500 : 0.000477798
+Precalculation time: 6
++----+---------+---------+
+|  N |    HR   |    FA   |
++----+---------+---------+
+|   1|        1|        1|
++----+---------+---------+
+|   2|        1|    0.204|
++----+---------+---------+
+|   3|        1|    0.026|
++----+---------+---------+
+END>
+bash-4.2$ 
