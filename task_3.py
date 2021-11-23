@@ -15,7 +15,7 @@ KERNEL_DERIVATIVE_Y = np.array([
 MINIMUM_RADIUS = 20
 MAXIMUM_RADIUS = 90
 
-T_S = 250
+T_S = 300
 T_H = 100
 
 def convolution(image, kernel):
@@ -71,14 +71,14 @@ def hough(gradient_magnitude, gradient_direction):
         for y in range(image_width):
             if gradient_magnitude_threshold[x][y] == 255:
                 for r in range(radii):
-                    x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(gradient_direction[x][y]))
-                    y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(gradient_direction[x][y]))
-                    if x_0 > 0 and x_0 < image_height and y_0 > 0 and y_0 < image_width:
-                        hough_space[x_0][y_0][r] += 1
-                    # x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(gradient_direction[x][y] + np.pi))
-                    # y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(gradient_direction[x][y] + np.pi))
+                    # x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(gradient_direction[x][y]))
+                    # y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(gradient_direction[x][y]))
                     # if x_0 > 0 and x_0 < image_height and y_0 > 0 and y_0 < image_width:
                     #     hough_space[x_0][y_0][r] += 1
+                    x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(gradient_direction[x][y] + np.pi))
+                    y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(gradient_direction[x][y] + np.pi))
+                    if x_0 > 0 and x_0 < image_height and y_0 > 0 and y_0 < image_width:
+                        hough_space[x_0][y_0][r] += 1
 
     return hough_space
 
