@@ -95,13 +95,13 @@ def main():
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
 
-    t_h = int(np.max(hough_space_circles_threshold) * 0.7)
+    t_h = int(np.max(hough_space_circles) * 0.7)
 
     for x in range(image_height):
         for y in range(image_width):
             for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
-                if hough_space_circles_threshold[x][y][r] >= t_h:
-                    print(hough_space_circles_threshold[x][y][r])
+                if hough_space_circles[x][y][r] >= t_h:
+                    print(hough_space_circles[x][y][r])
                     cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
     cv2.imshow("Display window", image)
