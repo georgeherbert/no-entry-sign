@@ -24,7 +24,7 @@ mode: ALL
 <BEGIN
 POS count : consumed   500 : 500
 NEG count : acceptanceRatio    500 : 1
-Precalculation time: 7
+Precalculation time: 6
 +----+---------+---------+
 |  N |    HR   |    FA   |
 +----+---------+---------+
@@ -35,32 +35,34 @@ END>
 ===== TRAINING 1-stage =====
 <BEGIN
 POS count : consumed   500 : 500
-NEG count : acceptanceRatio    500 : 0.0163356
-Precalculation time: 6
+NEG count : acceptanceRatio    500 : 0.0192197
+Precalculation time: 7
 +----+---------+---------+
 |  N |    HR   |    FA   |
 +----+---------+---------+
 |   1|        1|        1|
 +----+---------+---------+
-|   2|        1|    0.114|
+|   2|        1|    0.058|
 +----+---------+---------+
-|   3|        1|     0.02|
+|   3|        1|    0.018|
 +----+---------+---------+
 END>
 
 ===== TRAINING 2-stage =====
 <BEGIN
 POS count : consumed   500 : 500
-NEG count : acceptanceRatio    500 : 0.000477798
+NEG count : acceptanceRatio    500 : 0.00067337
 Precalculation time: 6
 +----+---------+---------+
 |  N |    HR   |    FA   |
 +----+---------+---------+
 |   1|        1|        1|
 +----+---------+---------+
-|   2|        1|    0.204|
+|   2|        1|    0.138|
 +----+---------+---------+
-|   3|        1|    0.026|
+|   3|        1|    0.138|
++----+---------+---------+
+|   4|        1|     0.03|
 +----+---------+---------+
 END>
-bash-4.2$ 
+
