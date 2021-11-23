@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-NUM = 1
+NUM = 2
 
 def get_bounding_boxes(directory):
     with open(f"faces_detected/{directory}/{NUM}.txt") as f:
