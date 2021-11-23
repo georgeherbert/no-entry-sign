@@ -95,13 +95,19 @@ def distance(x1, y1, x2, y2):
 
 def get_distinct_circles(circles):
     distinct_circles = []
-    for (x1, y1, r1, h1) in circles:
+    for (x1, y1, r1, w1) in circles:
         exists_in_distinct = False
-        for (x2, y2, r2, h2) in distinct_circles:
+        for i, (x2, y2, r2, w2) in enumerate(distinct_circles):
             if distance(x1, y1, x2, y2) < MIN_DISTANCE:
+                new_w2 = w1 + w2
+                new_x2 = (w2 * x2 + w1 * x1) / (new_w2)
+                new_y2 = (w2 * y2 + w1 * y1) / (new_w2)
+                new_r2 = (w2 * r2 + w1 * r1) / (new_w2)
+                distinct_circles[i] = [new_x2, new_y2, new_r2, new_w2]
                 exists_in_distinct = True
+                break
         if not exists_in_distinct:
-            distinct_circles.append([x1, y1, r1, h1])
+            distinct_circles.append([x1, y1, r1, w1])
     return distinct_circles
 
 def main():
@@ -133,9 +139,9 @@ def main():
 
     for (x, y, r, h) in distinct_circles:
         print(x, y)
-        cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (255, 0, 0), 2)
+        cv2.circle(image, (int(y), int(x)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
 
-    cv2.imwrite("task_3/9_output_image.jpg", image)
+    cv2.imwrite("task_3/8_output_image.jpg", image)
     # cv2.imshow("Display window", image)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
