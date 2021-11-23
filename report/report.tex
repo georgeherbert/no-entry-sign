@@ -1,4 +1,4 @@
-\documentclass[onecolumn, 11pt, a4paper]{article}
+\documentclass[onecolumn, 12pt, a4paper]{article}
 \usepackage[a4paper,left = 2cm,right = 2cm, top = 2cm, bottom = 2cm]{geometry}
 \usepackage{pgfplots}
 % \usepackage{physics}
@@ -24,6 +24,22 @@
 \section{The Viola-Jones object detector}
 
 \section{Building and testing my own detector}
+
+\subsection{Training performance}
+
+ROC graph
+\begin{tikzpicture}
+\begin{axis}[]
+\addplot+[
+  only marks,
+  % mark size=2.9pt
+]
+table[]
+{fpr_tpr.dat};
+\end{axis}
+\end{tikzpicture}
+
+\subsection{Testing performance}
 
 \section{Integration with shape detectors}
 
