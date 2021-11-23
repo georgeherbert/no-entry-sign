@@ -4,6 +4,7 @@ import cv2
 
 MINIMUM_RADIUS = 10
 MAXIMUM_RADIUS = 110
+MIN_DISTANCE = 20
 
 T_S = 250
 T_H = 100
@@ -78,6 +79,31 @@ def viola_jones_detect(image_grey):
     )
     return objects_detected
 
+def get_possible_circles(image_height, image_width, hough_space_circles):
+    t_h = int(np.max(hough_space_circles) * 0.5)
+    circles = []
+    for x in range(image_height):
+        for y in range(image_width):
+            for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
+                if hough_space_circles[x][y][r] >= t_h:
+                    circles.append([x, y, r, hough_space_circles[x][y][r]])
+                    # cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (255, 0, 0), 2)
+    return circles
+
+def distance(x1, y1, x2, y2):
+    return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+def get_distinct_circles(circles):
+    distinct_circles = []
+    for (x1, y1, r1, h1) in circles:
+        exists_in_distinct = False
+        for (x2, y2, r2, h2) in distinct_circles:
+            if distance(x1, y1, x2, y2) < MIN_DISTANCE:
+                exists_in_distinct = True
+        if not exists_in_distinct:
+            distinct_circles.append([x1, y1, r1, h1])
+    return distinct_circles
+
 def main():
     image = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
     image_grey = cv2.cvtColor(src = image, code = cv2.COLOR_BGR2GRAY)
@@ -89,11 +115,11 @@ def main():
     hough_space_circles_display = display_hough_space(hough_space_circles)
     cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
-    t_h = 0.5 * hough_space_circles.max()
-    hough_space_circles_threshold = hough_space_circles_display.copy()
-    hough_space_circles_threshold[hough_space_circles_threshold < t_h] = 0
-    hough_space_circles_threshold[hough_space_circles_threshold >= t_h] = 255
-    cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_circles_threshold)
+    # t_h = 0.5 * hough_space_circles.max()
+    # hough_space_circles_threshold = hough_space_circles_display.copy()
+    # hough_space_circles_threshold[hough_space_circles_threshold < t_h] = 0
+    # hough_space_circles_threshold[hough_space_circles_threshold >= t_h] = 255
+    # cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_circles_threshold)
 
     objects_detected = viola_jones_detect(image_grey)
     for (x, y, w, h) in objects_detected:
@@ -102,16 +128,12 @@ def main():
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
 
-    t_h = int(np.max(hough_space_circles) * 0.5)
+    circles = get_possible_circles(image_height, image_width, hough_space_circles)
+    distinct_circles = get_distinct_circles(circles)
 
-    # circles = []
-    for x in range(image_height):
-        for y in range(image_width):
-            for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
-                if hough_space_circles[x][y][r] >= t_h:
-                    # circles.append[x, y, r, hough_space_circles[x][y][r]]
-                    cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (255, 0, 0), 2)
-
+    for (x, y, r, h) in distinct_circles:
+        print(x, y)
+        cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (255, 0, 0), 2)
 
     cv2.imwrite("task_3/9_output_image.jpg", image)
     # cv2.imshow("Display window", image)
