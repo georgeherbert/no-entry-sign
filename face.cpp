@@ -38,7 +38,7 @@ int main( int argc, const char** argv )
 	detectAndDisplay( frame );
 
 	// 4. Save Result Image
-	imwrite("detected/" + argv[1] + ".jpg" + , frame );
+	imwrite("detected.jpg", frame );
 
 	return 0;
 }
