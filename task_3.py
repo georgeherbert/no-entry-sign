@@ -89,10 +89,7 @@ def main():
     hough_space_circles_display = display_hough_space(hough_space_circles)
     cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
-    hough_space_circles_display_mean = np.mean(hough_space_circles_display.flatten())
-    hough_space_circles_display_std = np.std(hough_space_circles_display.flatten())
-    t_h = hough_space_circles_display_mean + 6 * hough_space_circles_display_std
-    # t_h = hough_space_circles_mean + 3 * hough_space_circles_std
+    t_h = 0.5 * hough_space_circles.max()
     hough_space_circles_threshold = hough_space_circles_display.copy()
     hough_space_circles_threshold[hough_space_circles_threshold < t_h] = 0
     hough_space_circles_threshold[hough_space_circles_threshold >= t_h] = 255
@@ -107,12 +104,13 @@ def main():
 
     t_h = int(np.max(hough_space_circles) * 0.5)
 
+    # circles = []
     for x in range(image_height):
         for y in range(image_width):
             for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
                 if hough_space_circles[x][y][r] >= t_h:
-                    print(hough_space_circles[x][y][r])
-                    cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
+                    # circles.append[x, y, r, hough_space_circles[x][y][r]]
+                    cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (255, 0, 0), 2)
 
 
     cv2.imwrite("task_3/9_output_image.jpg", image)
