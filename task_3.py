@@ -138,7 +138,6 @@ def main():
     distinct_circles = get_distinct_circles(circles)
 
     for (x, y, r, h) in distinct_circles:
-        print(x, y)
         cv2.circle(image, (int(y), int(x)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
 
     cv2.imwrite("task_3/8_output_image.jpg", image)
