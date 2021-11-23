@@ -76,6 +76,21 @@ def display_hough_space(hough_space):
     summed_hough_space_display = normalise(summed_hough_space)
     return summed_hough_space_display
 
+def viola_jones_detect(image_grey):
+    cascade = cv2.CascadeClassifier("NoEntryCascade/cascade.xml")
+    objects_detected = cascade.detectMultiScale(
+        image_grey,
+        scaleFactor = 1.1,
+        minNeighbors = 1,
+        flags = cv2.CASCADE_SCALE_IMAGE,
+        minSize = (10, 10),
+        maxSize = (300, 300)
+    )
+    return objects_detected
+    print(len(faces))
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
 def main():
     image = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
     image_grey = cv2.cvtColor(src = image, code = cv2.COLOR_BGR2GRAY)
@@ -83,7 +98,7 @@ def main():
 
     gradient_magnitude, gradient_direction = sobel(image_grey)
 
-    hough_space_circles = hough_circles(gradient_magnitude, gradient_direction,)
+    hough_space_circles = hough_circles(gradient_magnitude, gradient_direction)
     hough_space_circles_display = display_hough_space(hough_space_circles)
     cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
@@ -91,6 +106,10 @@ def main():
     hough_space_circles_threshold[hough_space_circles_threshold < T_H] = 0
     hough_space_circles_threshold[hough_space_circles_threshold >= T_H] = 255
     cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_circles_threshold)
+
+    objects_detected = viola_jones_detect(image_grey)
+    for (x, y, w, h) in objects_detected:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2) 
 
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
@@ -104,6 +123,8 @@ def main():
                     print(hough_space_circles[x][y][r])
                     cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
+
+    cv2.imwrite("task_3/9_output_image.jpg", image)
     cv2.imshow("Display window", image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
