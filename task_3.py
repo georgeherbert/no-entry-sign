@@ -68,7 +68,7 @@ def display_hough_space(hough_space):
     return summed_hough_space_display
 
 def viola_jones_detect(image_grey):
-    cascade = cv2.CascadeClassifier("NoEntryCascade/cascade.xml")
+    cascade = cv2.CascadeClassifier("NoEntrycascade/cascade.xml")
     objects_detected = cascade.detectMultiScale(
         image_grey,
         scaleFactor = 1.1,
