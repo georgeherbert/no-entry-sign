@@ -2,16 +2,6 @@ import sys
 import numpy as np
 import cv2
 
-KERNEL_DERIVATIVE_X = np.array([
-    [1, 0, -1],
-    [2, 0, -2],
-    [1, 0, -1]
-])
-KERNEL_DERIVATIVE_Y = np.array([
-    [1, 2, 1],
-    [0, 0, 0],
-    [-1, -2, -1]
-])
 MINIMUM_RADIUS = 20
 MAXIMUM_RADIUS = 90
 
@@ -87,9 +77,6 @@ def viola_jones_detect(image_grey):
         maxSize = (300, 300)
     )
     return objects_detected
-    print(len(faces))
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 def main():
     image = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
@@ -102,6 +89,9 @@ def main():
     hough_space_circles_display = display_hough_space(hough_space_circles)
     cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
+    # hough_space_circles_mean = np.mean(hough_space_circles_display.flatten())
+    # hough_space_circles_std = np.std(hough_space_circles_display.flatten())
+    # t_h = hough_space_circles_mean + 3 * hough_space_circles_std
     hough_space_circles_threshold = hough_space_circles_display.copy()
     hough_space_circles_threshold[hough_space_circles_threshold < T_H] = 0
     hough_space_circles_threshold[hough_space_circles_threshold >= T_H] = 255
@@ -120,7 +110,7 @@ def main():
         for y in range(image_width):
             for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
                 if hough_space_circles[x][y][r] >= t_h:
-                    print(hough_space_circles[x][y][r])
+                    # print(hough_space_circles[x][y][r])
                     cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
 
