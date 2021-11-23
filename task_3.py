@@ -43,7 +43,7 @@ def sobel(image):
 
     return gradient_magnitude, gradient_direction
 
-def hough(gradient_magnitude, gradient_direction):
+def hough_circles(gradient_magnitude, gradient_direction):
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
 
@@ -83,25 +83,25 @@ def main():
 
     gradient_magnitude, gradient_direction = sobel(image_grey)
 
-    hough_space = hough(gradient_magnitude, gradient_direction,)
-    hough_space_display = display_hough_space(hough_space)
-    cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_display)
+    hough_space_circles = hough_circles(gradient_magnitude, gradient_direction,)
+    hough_space_circles_display = display_hough_space(hough_space_circles)
+    cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
-    hough_space_threshold = hough_space_display.copy()
-    hough_space_threshold[hough_space_threshold < T_H] = 0
-    hough_space_threshold[hough_space_threshold >= T_H] = 255
-    cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_threshold)
+    hough_space_circles_threshold = hough_space_circles_display.copy()
+    hough_space_circles_threshold[hough_space_circles_threshold < T_H] = 0
+    hough_space_circles_threshold[hough_space_circles_threshold >= T_H] = 255
+    cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_circles_threshold)
 
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
 
-    t_h = int(np.max(hough_space) * 0.7)
+    t_h = int(np.max(hough_space_circles_threshold) * 0.7)
 
     for x in range(image_height):
         for y in range(image_width):
             for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
-                if hough_space[x][y][r] >= t_h:
-                    print(hough_space[x][y][r])
+                if hough_space_circles_threshold[x][y][r] >= t_h:
+                    print(hough_space_circles_threshold[x][y][r])
                     cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
     cv2.imshow("Display window", image)
