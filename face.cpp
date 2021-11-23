@@ -12,6 +12,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <stdio.h>
 
 using namespace std;
@@ -62,7 +64,7 @@ void detectAndDisplay( Mat frame )
        // 4. Draw box around faces found
 	for( int i = 0; i < faces.size(); i++ )
 	{
-		string face_pos = std::to_string(faces[i].x) + " " + std::to_string(faces[i].y) + " " + std::to_string(faces[i].width) + " " + std::to_string(faces[i].height);
+		string face_pos = to_string(faces[i].x) + " " + to_string(faces[i].y) + " " + to_string(faces[i].width) + " " + to_string(faces[i].height);
 		std::cout << face_pos;
 		rectangle(frame, Point(faces[i].x, faces[i].y), Point(faces[i].x + faces[i].width, faces[i].y + faces[i].height), Scalar( 0, 255, 0 ), 2);
 	}
