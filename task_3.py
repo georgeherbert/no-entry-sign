@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import cv2
 
-MINIMUM_RADIUS = 20
-MAXIMUM_RADIUS = 90
+MINIMUM_RADIUS = 10
+MAXIMUM_RADIUS = 110
 
 T_S = 250
 T_H = 100
@@ -89,12 +89,13 @@ def main():
     hough_space_circles_display = display_hough_space(hough_space_circles)
     cv2.imwrite("task_3/7_summed_hough_space.jpg", hough_space_circles_display)
 
-    # hough_space_circles_mean = np.mean(hough_space_circles_display.flatten())
-    # hough_space_circles_std = np.std(hough_space_circles_display.flatten())
+    hough_space_circles_display_mean = np.mean(hough_space_circles_display.flatten())
+    hough_space_circles_display_std = np.std(hough_space_circles_display.flatten())
+    t_h = hough_space_circles_display_mean + 6 * hough_space_circles_display_std
     # t_h = hough_space_circles_mean + 3 * hough_space_circles_std
     hough_space_circles_threshold = hough_space_circles_display.copy()
-    hough_space_circles_threshold[hough_space_circles_threshold < T_H] = 0
-    hough_space_circles_threshold[hough_space_circles_threshold >= T_H] = 255
+    hough_space_circles_threshold[hough_space_circles_threshold < t_h] = 0
+    hough_space_circles_threshold[hough_space_circles_threshold >= t_h] = 255
     cv2.imwrite("task_3/8_summed_hough_space_threshold.jpg", hough_space_circles_threshold)
 
     objects_detected = viola_jones_detect(image_grey)
@@ -104,20 +105,20 @@ def main():
     image_height = gradient_magnitude.shape[0]
     image_width = gradient_magnitude.shape[1]
 
-    t_h = int(np.max(hough_space_circles) * 0.7)
+    t_h = int(np.max(hough_space_circles) * 0.5)
 
     for x in range(image_height):
         for y in range(image_width):
             for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
                 if hough_space_circles[x][y][r] >= t_h:
-                    # print(hough_space_circles[x][y][r])
+                    print(hough_space_circles[x][y][r])
                     cv2.circle(image, (y, x), r + MINIMUM_RADIUS, (0, 0, 255), 2)
 
 
     cv2.imwrite("task_3/9_output_image.jpg", image)
-    cv2.imshow("Display window", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Display window", image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
