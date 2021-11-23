@@ -62,7 +62,7 @@ void detectAndDisplay( Mat frame )
        // 4. Draw box around faces found
 	for( int i = 0; i < faces.size(); i++ )
 	{
-		std::cout << faces[i].x << " " << faces[i].y << " " << faces[i].width << " " << faces[i].height;
+		std::cout << faces[i].x << " " << faces[i].y << " " << faces[i].width << " " << faces[i].height << "\n"; 
 		rectangle(frame, Point(faces[i].x, faces[i].y), Point(faces[i].x + faces[i].width, faces[i].y + faces[i].height), Scalar( 0, 255, 0 ), 2);
 	}
 
