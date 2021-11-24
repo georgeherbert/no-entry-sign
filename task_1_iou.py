@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-NUM = 4
+NUM = 8
 
 class Image():
     def __init__(self, location):
@@ -18,11 +18,11 @@ class Image():
     def get_bounding_boxes(self, location):
         with open(f"faces_detected/{location}/{NUM}.txt") as f:
             lines = f.readlines()
-        return [list(map(int, line.strip().split(" "))) for line in lines]
+        return BoundingBoxes([BoundingBox(*list(map(int, line.strip().split(" ")))) for line in lines])
 
     def add_bounding_boxes_to_image(self, bounding_boxes, colour):
-        for (x, y, w, h) in bounding_boxes:
-            cv2.rectangle(self.image, (x, y), (x + w, y + h), colour, 2)
+        for box in bounding_boxes.boxes:
+            cv2.rectangle(self.image, (box.x, box.y), (box.x + box.w, box.y + box.h), colour, 2)
 
     def write_image(self):
         cv2.imwrite(f"faces_detected/task_1_images/{NUM}.jpg", self.image)
@@ -31,6 +31,17 @@ class Image():
         cv2.imshow("Display window", self.image)
         cv2.waitKey()
         cv2.destroyAllWindows()
+
+class BoundingBoxes():
+    def __init__(self, boxes):
+        self.boxes = boxes
+
+class BoundingBox():
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
 
 if __name__ == "__main__":
     Image(f"No_entry/NoEntry{NUM}.bmp")
