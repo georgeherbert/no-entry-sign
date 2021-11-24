@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-NUM = 0
+NUM = 11
 IOU_THRESHOLD = 0.5
 
 class Image():
@@ -14,10 +14,10 @@ class Image():
         self.add_to_image(self.ground_truth_bounding_boxes, (0, 0, 255))
 
         self.successful_intersections = self.calc_successful_intersections()
-        self.add_to_image(self.successful_intersections, (255, 0, 0))
+        # self.add_to_image(self.successful_intersections, (255, 0, 0))
 
         self.true_positive_rate = self.calc_true_positive_rate()
-        print(self.true_positive_rate)
+        print(f"TPR: {self.true_positive_rate}")
 
         self.write_image()
 
