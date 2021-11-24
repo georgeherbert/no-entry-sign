@@ -8,6 +8,7 @@
 \usepackage{float}
 % \usepackage{titlesec}
 \usepackage{wrapfig}
+\usepackage{lipsum}
  
 \graphicspath{{./images/}}
 % \pgfplotsset{compat = 1.17}
@@ -54,12 +55,13 @@
 
 \subsection{IOU, TPR and F\textsubscript{1} score}
 
-\begin{wraptable}{r}{0.45\textwidth}
+\begin{wraptable}{r}{0.4\textwidth}
+  \vspace{-2.5em}
   \begin{center}
   \caption{True positive rate and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:face}
   \begin{tabular}{l l l} 
     \hline\hline
-    Filename & True positive rate & F\textsubscript{1} score\\
+    File & TPR & F\textsubscript{1} score\\
     \hline
     NoEntry0.jpg & Undefined & 0.00 \\ 
     NoEntry1.jpg & 1.00 & 0.20 \\ 
@@ -83,7 +85,7 @@
 \end{wraptable} 
 
 When assessing the true positive rate (TPR), the first practical difficulty that arises is how to define a bounding box as being positive.
-I opted to define bounding boxes as positive if they had an intersection-over-union value of 50\% or greater.
+I opted to define bounding boxes as positive if they had an intersection-over-union (IOU) value of 50\% or greater.
 
 On any detection task, it is possible to achieve a TPR of 100\% by detecting everything as positive.
 By doing so, it eliminates the chance of there being any false negatives. 
