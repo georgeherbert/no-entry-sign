@@ -1,12 +1,12 @@
 import numpy as np
 import cv2
 
-NUM = 11
 IOU_THRESHOLD = 0.5
 
 class Image():
-    def __init__(self, location):
-        self.image = cv2.imread(location, cv2.IMREAD_COLOR)
+    def __init__(self, num):
+        self.num = num
+        self.image = cv2.imread(f"No_entry/NoEntry{self.num}.bmp", cv2.IMREAD_COLOR)
         self.face_cpp_bounding_boxes = self.get_bounding_boxes("face_cpp_bounding_boxes")
         self.ground_truth_bounding_boxes = self.get_bounding_boxes("ground_truth_bounding_boxes")
         
@@ -14,15 +14,14 @@ class Image():
         self.add_to_image(self.ground_truth_bounding_boxes, (0, 0, 255))
 
         self.successful_intersections = self.calc_successful_intersections()
-        # self.add_to_image(self.successful_intersections, (255, 0, 0))
-
-        self.true_positive_rate = self.calc_true_positive_rate()
-        print(f"TPR: {self.true_positive_rate}")
+        self.add_to_image(self.successful_intersections, (255, 0, 0))
+        self.true_positive_rate()
+        self.f1_score()
 
         self.write_image()
 
     def get_bounding_boxes(self, location):
-        with open(f"faces_detected/{location}/{NUM}.txt") as f:
+        with open(f"faces_detected/{location}/{self.num}.txt") as f:
             lines = f.readlines()
         return [BoundingBox(*list(map(int, line.strip().split(" ")))) for line in lines]
 
@@ -51,16 +50,26 @@ class Image():
                     successful_intersections.append(largest_intersection[0])
         return successful_intersections
 
-    def calc_true_positive_rate(self):
+    def true_positive_rate(self):
         true_positives = len(self.successful_intersections)
         if true_positives:
             true_positive_rate = true_positives / len(self.ground_truth_bounding_boxes)
         else:
             true_positive_rate = None
-        return true_positive_rate
+        print(f"TPR: {true_positive_rate}")
+
+    def f1_score(self):
+        true_positives = len(self.successful_intersections)
+        false_positives = len(self.face_cpp_bounding_boxes) - true_positives
+        false_negatives = len(self.ground_truth_bounding_boxes) - true_positives
+        if true_positives and false_positives and false_negatives:
+            score = true_positives / (true_positives + 0.5 * (false_positives + false_negatives))
+        else:
+            score = None
+        print(f"F1: {score}")
 
     def write_image(self):
-        cv2.imwrite(f"faces_detected/task_1_images/{NUM}.jpg", self.image)
+        cv2.imwrite(f"faces_detected/task_1_images/{self.num}.jpg", self.image)
 
 class BoundingBox():
     def __init__(self, x, y, w, h):
@@ -73,4 +82,8 @@ class BoundingBox():
         cv2.rectangle(image, (self.x, self.y), (self.x + self.w, self.y + self.h), colour, 2)
 
 if __name__ == "__main__":
-    Image(f"No_entry/NoEntry{NUM}.bmp")
+    for i in range(0, 16):
+        print(f"Image {i}")
+        print("-" * 10)
+        Image(i)
+        print("")
