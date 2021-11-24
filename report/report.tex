@@ -2,11 +2,12 @@
 \usepackage[a4paper, left = 1cm,right = 1cm, top = 1cm, bottom = 1cm, footskip = 0.5cm]{geometry}
 % \usepackage{pgfplots}
 % \usepackage{physics}
-% \usepackage{amsmath}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{float}
 % \usepackage{titlesec}
+\usepackage{wrapfig}
  
 \graphicspath{{./images/}}
 % \pgfplotsset{compat = 1.17}
@@ -53,33 +54,45 @@
 
 \subsection{IOU, TPR and F\textsubscript{1} score}
 
-\begin{table}[H]
+\begin{wraptable}{r}{0.45\textwidth}
   \begin{center}
-    \caption{\label{tab:face}True positive rate and F\textsubscript{1} score of the frontal face detector on each image}
-    \begin{tabular}{l l l} 
-      \hline\hline
-      Filename & True positive rate & F\textsubscript{1} score\\
-      \hline
-      NoEntry0.jpg & 0 & 0 \\ 
-      NoEntry1.jpg & 0 & 0 \\ 
-      NoEntry2.jpg & 0 & 0 \\ 
-      NoEntry3.jpg & 0 & 0 \\ 
-      NoEntry4.jpg & 0 & 0 \\ 
-      NoEntry5.jpg & 0 & 0 \\ 
-      NoEntry6.jpg & 0 & 0 \\ 
-      NoEntry7.jpg & 0 & 0 \\ 
-      NoEntry8.jpg & 0 & 0 \\ 
-      NoEntry9.jpg & 0 & 0 \\ 
-      NoEntry10.jpg & 0 & 0 \\ 
-      NoEntry11.jpg & 0 & 0 \\ 
-      NoEntry12.jpg & 0 & 0 \\ 
-      NoEntry13.jpg & 0 & 0 \\ 
-      NoEntry14.jpg & 0 & 0 \\ 
-      NoEntry15.jpg & 0 & 0 \\ 
-      \hline
-    \end{tabular}
+  \caption{True positive rate and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:face}
+  \begin{tabular}{l l l} 
+    \hline\hline
+    Filename & True positive rate & F\textsubscript{1} score\\
+    \hline
+    NoEntry0.jpg & Undefined & 0.00 \\ 
+    NoEntry1.jpg & 1.00 & 0.20 \\ 
+    NoEntry2.jpg & 0.25 & 0.18 \\ 
+    NoEntry3.jpg & Undefined & Undefined \\ 
+    NoEntry4.jpg & 1.00 & 0.28 \\ 
+    NoEntry5.jpg & Undefined & 0.00 \\ 
+    NoEntry6.jpg & Undefined & 0.00 \\ 
+    NoEntry7.jpg & 0.50 & 0.22 \\ 
+    NoEntry8.jpg & Undefined & 0.00 \\ 
+    NoEntry9.jpg & Undefined & 0.00 \\ 
+    NoEntry10.jpg & Undefined & 0.00 \\ 
+    NoEntry11.jpg & 0.50 & 0.31 \\ 
+    NoEntry12.jpg & Undefined & 0.00 \\ 
+    NoEntry13.jpg & Undefined & 0.00 \\ 
+    NoEntry14.jpg & Undefined & 0.00 \\ 
+    NoEntry15.jpg & Undefined & 0.00 \\ 
+    \hline
+  \end{tabular}
   \end{center}
-\end{table}
+\end{wraptable} 
+
+When assessing the true positive rate (TPR), the first practical difficulty that arises is how to define a bounding box as being positive.
+I opted to define bounding boxes as positive if they had an intersection-over-union value of 50\% or greater.
+
+On any detection task, it is possible to achieve a TPR of 100\% by detecting everything as positive.
+By doing so, it eliminates the chance of there being any false negatives. 
+Since TPR is defined as \[\text{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}}\]
+if you eliminate all false negatives (i.e. $\text{FN} = 0$), the fraction will become
+\[\text{TPR} = \frac{\text{TP}}{\text{TP} + 0} = \frac{\text{TP}}{\text{TP}} = 1\]
+thus providing you with a TPR of 100\%.
+
+\clearpage
 
 \section{Building and testing my own detector}
 
