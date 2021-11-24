@@ -14,7 +14,8 @@ class Image():
         self.add_to_image(self.ground_truth_bounding_boxes, (0, 0, 255))
 
         self.successful_intersections = self.calc_successful_intersections()
-        self.add_to_image(self.successful_intersections, (255, 0, 0))
+        # self.add_to_image(self.successful_intersections, (255, 0, 0))
+        
         self.true_positive_rate()
         self.f1_score()
 
@@ -62,7 +63,7 @@ class Image():
         true_positives = len(self.successful_intersections)
         false_positives = len(self.face_cpp_bounding_boxes) - true_positives
         false_negatives = len(self.ground_truth_bounding_boxes) - true_positives
-        if true_positives and false_positives and false_negatives:
+        if true_positives or false_positives or false_negatives:
             score = true_positives / (true_positives + 0.5 * (false_positives + false_negatives))
         else:
             score = None
