@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 
-NUM = 5
+NUM = 0
+IOU_THRESHOLD = 0.5
 
 class Image():
     def __init__(self, location):
@@ -9,52 +10,57 @@ class Image():
         self.face_cpp_bounding_boxes = self.get_bounding_boxes("face_cpp_bounding_boxes")
         self.ground_truth_bounding_boxes = self.get_bounding_boxes("ground_truth_bounding_boxes")
         
-        self.add_bounding_boxes_to_image(self.face_cpp_bounding_boxes, (0, 255, 0))
-        self.add_bounding_boxes_to_image(self.ground_truth_bounding_boxes, (0, 0, 255))
+        self.add_to_image(self.face_cpp_bounding_boxes, (0, 255, 0))
+        self.add_to_image(self.ground_truth_bounding_boxes, (0, 0, 255))
 
-        self.intersection_over_union()
+        self.successful_intersections = self.calc_successful_intersections()
+        self.add_to_image(self.successful_intersections, (255, 0, 0))
+
+        self.true_positive_rate = self.calc_true_positive_rate()
+        print(self.true_positive_rate)
 
         self.write_image()
-        self.display_image()
 
     def get_bounding_boxes(self, location):
         with open(f"faces_detected/{location}/{NUM}.txt") as f:
             lines = f.readlines()
-        return BoundingBoxes([BoundingBox(*list(map(int, line.strip().split(" ")))) for line in lines])
+        return [BoundingBox(*list(map(int, line.strip().split(" ")))) for line in lines]
 
-    def add_bounding_boxes_to_image(self, bounding_boxes, colour):
-        for box in bounding_boxes.boxes:
-            cv2.rectangle(self.image, (box.x, box.y), (box.x + box.w, box.y + box.h), colour, 2)
+    def add_to_image(self, bounding_boxes, colour):
+        for bounding_box in bounding_boxes:
+            bounding_box.add_to_image(self.image, colour)
 
-    def intersection_over_union(self):
-        for face_cpp_bounding_box in self.face_cpp_bounding_boxes.boxes:
-            for ground_truth_bounding_box in self.ground_truth_bounding_boxes.boxes:
+    def calc_successful_intersections(self):
+        successful_intersections = []
+        for ground_truth_bounding_box in self.ground_truth_bounding_boxes:
+            potential_intersections = []
+            for face_cpp_bounding_box in self.face_cpp_bounding_boxes:
                 x_left = max(face_cpp_bounding_box.x, ground_truth_bounding_box.x)
                 y_top = max(face_cpp_bounding_box.y, ground_truth_bounding_box.y)
                 x_right = min(face_cpp_bounding_box.x + face_cpp_bounding_box.w, ground_truth_bounding_box.x + ground_truth_bounding_box.w)
                 y_bottom = min(face_cpp_bounding_box.y + face_cpp_bounding_box.h, ground_truth_bounding_box.y + ground_truth_bounding_box.h)
-
-                if x_right < x_left or y_bottom < y_top:
-                    # print(0)
-                    pass
-                else:
+                if x_right >= x_left and y_bottom >= y_top:
                     intersection_area = (x_right - x_left) * (y_bottom - y_top)
                     face_cpp_bounding_box_area = face_cpp_bounding_box.w * face_cpp_bounding_box.h
                     ground_truth_bounding_box_area = ground_truth_bounding_box.w * ground_truth_bounding_box.h
                     iou = intersection_area / (face_cpp_bounding_box_area + ground_truth_bounding_box_area - intersection_area)
-                    print(iou)
+                    potential_intersections.append([face_cpp_bounding_box, iou])
+            if potential_intersections:
+                largest_intersection = max(potential_intersections, key = lambda x: x[1])
+                if largest_intersection[1] > IOU_THRESHOLD:
+                    successful_intersections.append(largest_intersection[0])
+        return successful_intersections
+
+    def calc_true_positive_rate(self):
+        true_positives = len(self.successful_intersections)
+        if true_positives:
+            true_positive_rate = true_positives / len(self.ground_truth_bounding_boxes)
+        else:
+            true_positive_rate = None
+        return true_positive_rate
 
     def write_image(self):
         cv2.imwrite(f"faces_detected/task_1_images/{NUM}.jpg", self.image)
-
-    def display_image(self):
-        cv2.imshow("Display window", self.image)
-        cv2.waitKey()
-        cv2.destroyAllWindows()
-
-class BoundingBoxes():
-    def __init__(self, boxes):
-        self.boxes = boxes
 
 class BoundingBox():
     def __init__(self, x, y, w, h):
@@ -62,6 +68,9 @@ class BoundingBox():
         self.y = y
         self.w = w
         self.h = h
+
+    def add_to_image(self, image, colour):
+        cv2.rectangle(image, (self.x, self.y), (self.x + self.w, self.y + self.h), colour, 2)
 
 if __name__ == "__main__":
     Image(f"No_entry/NoEntry{NUM}.bmp")
