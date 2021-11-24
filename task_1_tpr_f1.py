@@ -1,4 +1,3 @@
-import numpy as np
 import cv2
 
 IOU_THRESHOLD = 0.5
