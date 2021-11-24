@@ -66,8 +66,9 @@ class Image():
 
     def true_positive_rate(self):
         true_positives = len(self.successful_intersections)
-        if true_positives:
-            true_positive_rate = true_positives / len(self.ground_truth_bounding_boxes)
+        actual_positives = len(self.ground_truth_bounding_boxes)
+        if actual_positives:
+            true_positive_rate = true_positives / actual_positives
         else:
             true_positive_rate = None
         print(f"TPR: {true_positive_rate}")
