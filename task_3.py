@@ -24,7 +24,7 @@ class Image():
         self.error_sign_detector = ErrorSignDetector(self.image, self.hough_circles.boxes, self.viola_jones_objects.objects)
 
         # self.hough_circles.draw_circles()
-        self.viola_jones_objects.draw_boxes()
+        # self.viola_jones_objects.draw_boxes()
         self.save_images()
 
     def normalise(self, image):
