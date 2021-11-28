@@ -21,9 +21,9 @@ class Image():
         self.write_image()
 
     def get_detected_bounding_boxes(self):
-        cascade = cv2.CascadeClassifier("Noentrycascade/cascade.xml")
+        cascade = cv2.CascadeClassifier("NoEntrycascade/cascade.xml")
         image_grey = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        image_grey = cv2.equalizeHist(image_grey)
+        # image_grey = cv2.equalizeHist(image_grey)
         objects_detected = cascade.detectMultiScale(
             image_grey,
             scaleFactor = 1.1,

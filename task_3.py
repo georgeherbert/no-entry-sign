@@ -9,6 +9,8 @@ MIN_DISTANCE = 50
 T_S = 250
 # T_H = 100
 
+IOU_THRESHOLD = 0.5
+
 class Image():
     def __init__(self, file):
         self.image = cv2.imread(file, cv2.IMREAD_COLOR)
@@ -19,8 +21,9 @@ class Image():
         self.gradient_direction = np.arctan2(self.dy, self.dx)
         self.hough_circles = HoughSpaceCircles(self.image, self.gradient_magnitude, self.gradient_direction)
         self.viola_jones_objects = ViolaJonesObjects(self.image, self.image_grey)
+        self.error_sign_detector = ErrorSignDetector(self.image, self.hough_circles.boxes, self.viola_jones_objects.objects)
 
-        self.hough_circles.draw_circles()
+        # self.hough_circles.draw_circles()
         self.viola_jones_objects.draw_boxes()
         self.save_images()
 
@@ -126,6 +129,37 @@ class ViolaJonesObjects():
     def draw_boxes(self):
         for x, y, w, h in self.objects:
             cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2) 
+
+class ErrorSignDetector():
+    def __init__(self, image, hough_boxes, viola_jones_boxes):
+        self.image = image
+        self.hough_boxes = hough_boxes
+        self.viola_jones_boxes = viola_jones_boxes
+        self.custom_boxes = self.calc_successful_intersections()
+
+        for x, y, w, h in self.custom_boxes:
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2) 
+
+    def calc_successful_intersections(self):
+        successful_intersections = []
+        for x1, y1, w1, h1 in self.hough_boxes:
+            potential_intersections = []
+            for x2, y2, w2, h2 in self.viola_jones_boxes:
+                x_left = max(x1, x2)
+                y_top = max(y1, y2)
+                x_right = min(x1 + w1, x2 + w2)
+                y_bottom = min(y1 + h1, y2 + h2)
+                if x_right >= x_left and y_bottom >= y_top:
+                    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+                    hough_box_area = w1 * h1
+                    viola_jones_area = w2 * h2
+                    iou = intersection_area / (hough_box_area + viola_jones_area - intersection_area)
+                    potential_intersections.append([(x2, y2, w2, h2), iou])
+            if potential_intersections:
+                largest_intersection = max(potential_intersections, key = lambda x: x[1])
+                if largest_intersection[1] > IOU_THRESHOLD:
+                    successful_intersections.append(largest_intersection[0])
+        return successful_intersections
 
 if __name__ == "__main__":
     Image(sys.argv[1])
