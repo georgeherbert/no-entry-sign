@@ -107,9 +107,8 @@ class HoughSpaceCircles():
     def draw_circles(self):
         for x, y, r, _ in self.circles:
             cv2.circle(self.image, (int(x), int(y)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
-            print(x, y)
-        for x, y, w, h in self.boxes:
-            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2) 
+        # for x, y, w, h in self.boxes:
+        #     cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2) 
 
 class ViolaJonesObjects():
     def __init__(self, image, image_grey):
