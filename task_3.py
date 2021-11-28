@@ -49,6 +49,7 @@ class HoughSpaceCircles():
         self.hough_space = self.get_hough_space()
         self.possible_circles = self.get_possible_circles()
         self.circles = self.get_circles()
+        self.boxes = [(int(x - r - MINIMUM_RADIUS), int(y - r - MINIMUM_RADIUS), int((r + MINIMUM_RADIUS) * 2), int((r + MINIMUM_RADIUS) * 2)) for x, y, r, _ in self.circles]
 
     def get_gradient_magnitude_threshold(self):
         gradient_magnitude_threshold = self.gradient_magnitude.copy()
@@ -76,11 +77,11 @@ class HoughSpaceCircles():
     def get_possible_circles(self):
         t_h = int(np.max(self.hough_space) * 0.5)
         circles = []
-        for x in range(self.height):
-            for y in range(self.width):
+        for y in range(self.height):
+            for x in range(self.width):
                 for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
-                    if self.hough_space[x][y][r] >= t_h:
-                        circles.append([x, y, r, self.hough_space[x][y][r]])
+                    if self.hough_space[y][x][r] >= t_h:
+                        circles.append([x, y, r, self.hough_space[y][x][r]])
         return circles
 
     def distance(self, x1, y1, x2, y2):
@@ -105,7 +106,10 @@ class HoughSpaceCircles():
 
     def draw_circles(self):
         for x, y, r, _ in self.circles:
-            cv2.circle(self.image, (int(y), int(x)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
+            cv2.circle(self.image, (int(x), int(y)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
+            print(x, y)
+        for x, y, w, h in self.boxes:
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2) 
 
 class ViolaJonesObjects():
     def __init__(self, image, image_grey):
