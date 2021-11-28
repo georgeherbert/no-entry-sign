@@ -9,7 +9,7 @@ MIN_DISTANCE = 50
 T_S = 250
 # T_H = 100
 
-IOU_THRESHOLD = 0.5
+IOU_THRESHOLD = 0.25
 
 class Image():
     def __init__(self, file):
@@ -110,8 +110,8 @@ class HoughSpaceCircles():
     def draw_circles(self):
         for x, y, r, _ in self.circles:
             cv2.circle(self.image, (int(x), int(y)), int(r) + MINIMUM_RADIUS, (255, 0, 0), 2)
-        # for x, y, w, h in self.boxes:
-        #     cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2) 
+        for x, y, w, h in self.boxes:
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2) 
 
 class ViolaJonesObjects():
     def __init__(self, image, image_grey):
@@ -128,7 +128,7 @@ class ViolaJonesObjects():
     
     def draw_boxes(self):
         for x, y, w, h in self.objects:
-            cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2) 
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 255, 0), 2) 
 
 class ErrorSignDetector():
     def __init__(self, image, hough_boxes, viola_jones_boxes):
@@ -154,7 +154,7 @@ class ErrorSignDetector():
                     hough_box_area = w1 * h1
                     viola_jones_area = w2 * h2
                     iou = intersection_area / (hough_box_area + viola_jones_area - intersection_area)
-                    potential_intersections.append([(x2, y2, w2, h2), iou])
+                    potential_intersections.append([(x1, y1, w1, h1), iou])
             if potential_intersections:
                 largest_intersection = max(potential_intersections, key = lambda x: x[1])
                 if largest_intersection[1] > IOU_THRESHOLD:
