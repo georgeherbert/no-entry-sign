@@ -9,7 +9,7 @@ MIN_DISTANCE = 50
 T_S = 250
 # T_H = 100
 
-IOU_THRESHOLD = 0.25
+IOU_THRESHOLD = 0.5
 
 class Image():
     def __init__(self, file):
@@ -116,7 +116,7 @@ class HoughSpaceCircles():
 class ViolaJonesObjects():
     def __init__(self, image, image_grey):
         self.image = image
-        self.cascade = cv2.CascadeClassifier("NoEntrycascade/cascade.xml")
+        self.cascade = cv2.CascadeClassifier("training/NoEntrycascade/cascade.xml")
         self.objects = self.cascade.detectMultiScale(
             image_grey,
             scaleFactor = 1.1,
