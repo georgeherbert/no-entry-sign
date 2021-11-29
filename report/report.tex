@@ -1,4 +1,4 @@
-\documentclass[onecolumn, 11pt, a4paper]{article}
+\documentclass[onecolumn, 10pt, a4paper]{article}
 \usepackage[a4paper, left = 1cm,right = 1cm, top = 1cm, bottom = 1cm, footskip = 0.5cm]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -152,11 +152,26 @@ ROC graph
 
 \section{Integration with shape detectors}
 
-\subsection{Hough details}
+\begin{figure}[H]
+  \vspace{-1.5em}
+  \centering
+  \subfloat[NoEntry5.jpg]{
+    \centering
+    \includegraphics[height = 0.1025\textheight]{images/task_3_5.jpg}
+    \includegraphics[height = 0.1025\textheight]{images/5_gradient_magnitude_threshold.jpg}
+    \includegraphics[height = 0.1025\textheight]{images/5_hough_space.jpg}}
+  \hfill
+  \subfloat[NoEntry15.jpg]{
+    \centering
+    \includegraphics[height = 0.1025\textheight]{images/task_3_15.jpg}
+    \includegraphics[height = 0.1025\textheight]{images/15_gradient_magnitude_threshold.jpg}
+    \includegraphics[height = 0.1025\textheight]{images/15_hough_space.jpg}}
+  \caption{Two examples of no entry sign images which exhibit the merit and limitations of my implementation, and their corresponding gradient magnitude threshold and 2D hough space images}\label{fig:hough_details}
+\end{figure}
 
 \subsection{Evaluation}
 
-\begin{wraptable}{r}{0.49\textwidth}
+\begin{wraptable}{r}{0.45\textwidth}
   \vspace{-2.5em}
   \begin{center}
   \caption{TPR and F\textsubscript{1} score of the Viola-Jones integrated with circle Hough transform no entry sign detector and difference with Viola-Jones no entry sign detector results}\label{tab:shape}
@@ -188,7 +203,24 @@ ROC graph
   \end{center}
 \end{wraptable} 
 
+Table \ref{tab:shape} displays the TPR and F\textsubscript{1} score of this implementation, as well as the difference compared with the Viola-Jones implementation.
+The key merits and shortcomings include:
+\begin{itemize}
+\itemsep 0em 
+\item A vastly improved F\textsubscript{1} score, as a result of only defining no entry signs detected by the Viola-Jones detector as positive if accompanied by a corresponding circle in the circle Hough transform
+\item No real improvement to the TPR score, as essentially no extra no entry signs can be detected due to the algorithm used to integrate the two detectors
+\end{itemize}
+
 \subsection{Detection pipeline}
+
+Figure \ref{fig:flow} outlines the way I combined evidence in my algorithm.
+The rationale behind this was as follows:
+\begin{itemize}
+\itemsep 0em 
+\item The Viola-Jones detector detected approximately 50\% of no entry signs, but had a large number of false positives
+\item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a light bar horizontally between two dark bars
+\item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IoU with a Viola-Jones bounding box of greater than 50\%
+\end{itemize}
 
 \begin{figure}[H]
 \centering
@@ -204,29 +236,22 @@ ROC graph
   \draw [arrow] (start) -- (hc);
   \draw [arrow] (hc) -- (vj);
   \draw [arrow] (vj) -- (cartesian);
-  \draw [thick,-](0, -5.05) -- (0, -5.55);
-  \draw [thick,-](0, -5.55) -- (3, -5.55);
-  \draw [thick,-](3, -5.55) -- (3, 0.5);
+  \draw [thick,-](0, -5.0) -- (0, -5.5);
+  \draw [thick,-](0, -5.5) -- (3, -5.5);
+  \draw [thick,-](3, -5.5) -- (3, 0.5);
   \draw [thick,-stealth](3, 0.5) -- node[anchor = north] {First combination} (6.25, 0.5);
-  \draw [thick,-stealth](6.25, 0.5) -- (6.25, -0.05);
+  \draw [thick,-stealth](6.25, 0.5) -- (6.25, -0.1);
   \draw [arrow] (iou) -- node[anchor = west] {Yes} (list);
   \draw [arrow] (iou) -- node[anchor = south] {No} (done);
-  \draw [thick,-](9, -5.05) -- (9.85, -5.05);
-  \draw [thick,-stealth](9.85, -5.05) -- (9.85, -2);
-  \draw [thick,-](12.75, -0.1) -- node[anchor = west] {No} (12.75, 0.5);
+  \draw [thick,-](9, -5.05) -- (9.95, -5.05);
+  \draw [thick,-stealth](9.95, -5.05) -- (9.95, -2);
+  \draw [thick,-](12.75, -0.15) -- node[anchor = west] {No} (12.75, 0.5);
   \draw [thick,-stealth](12.75, 0.5) -- node[anchor = north] {Next combination} (6.25, 0.5);
   \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
 \end{tikzpicture}
 \caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough transform}
 \label{fig:flow}
 \end{figure}
-
-The rationale behind combining evidence in this way was as follows:
-\begin{itemize}
-\item The Viola-Jones detector was approximately 50\% effective at detecting no entry signs, but had a large number of false positives
-\item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a lighter area horizontally between two darker areas
-\item Since no entry signs are circles, we could choose to keep only the detected boxes from the Viola-Jones detector that also coincide with a circle
-\end{itemize}
 
 \clearpage
 
