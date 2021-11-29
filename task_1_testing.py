@@ -10,6 +10,11 @@ class Testing():
         self.face_cpp_boxes = self.get_face_cpp_boxes()
         self.ground_truth_boxes = self.get_ground_truth_boxes()
         self.successful_intersections = self.calculate_successful_intersections()
+
+        self.tp = len(self.successful_intersections)
+        self.fn = len(self.ground_truth_boxes) - self.tp
+        self.fp = len(self.face_cpp_boxes) - self.tp
+
         self.tpr = self.calculate_tpr()
         self.f1 = self.calculate_f1()
         
@@ -45,23 +50,18 @@ class Testing():
         return successful_intersections
 
     def calculate_tpr(self):
-        true_positives = len(self.successful_intersections)
-        actual_positives = len(self.ground_truth_boxes)
-        if actual_positives:
-            true_positive_rate = true_positives / actual_positives
+        if self.tp == 0 and self.fn == 0:
+            tpr = None
         else:
-            true_positive_rate = None
-        return true_positive_rate
+            tpr = self.tp / (self.tp + self.fn)
+        return tpr
 
     def calculate_f1(self):
-        true_positives = len(self.successful_intersections)
-        false_positives = len(self.face_cpp_boxes) - true_positives
-        false_negatives = len(self.ground_truth_boxes) - true_positives
-        if true_positives or false_positives or false_negatives:
-            f1_score = true_positives / (true_positives + 0.5 * (false_positives + false_negatives))
+        if self.tp == 0 and self.fn == 0 and self.fp == 0:
+            f1 = None
         else:
-            f1_score = None
-        return f1_score
+            f1 = self.tp / (self.tp + 0.5 * (self.fp + self.fn))
+        return f1
 
     def draw_boxes(self):
         for x, y, w, h in self.face_cpp_boxes:
@@ -75,8 +75,9 @@ class Testing():
         cv2.imwrite(f"task_1_testing_output/{self.num}.jpg", self.image)
 
 if __name__ == "__main__":
-    tprs = []
-    f1s = []
+    tp = 0
+    fn = 0
+    fp = 0
     for i in range(0, 16):
         test = Testing(i)
         test.draw_boxes()
@@ -84,13 +85,11 @@ if __name__ == "__main__":
         print(f"Image {i}")
         print("-" * 10)
         print(f"TPR: {test.tpr}")
-        if tpr := test.tpr != None:
-            tprs.append(test.tpr)
-        print(f"F1: {test.f1}")
-        if f1 := test.f1 != None:
-            f1s.append(test.f1)
-        print("")
+        print(f"F1: {test.f1}\n")
+        tp += test.tp
+        fn += test.fn
+        fp += test.fp
     print("Average")
     print("-" * 10)
-    print(f"TPR: {np.mean(tprs)}")
-    print(f"F1: {np.mean(f1s)}")
+    print(f"TPR: {tp / (tp + fn)}")
+    print(f"F1: {tp / (tp + 0.5 * (fp + fn))}")
