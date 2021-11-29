@@ -53,7 +53,7 @@
   \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
 \end{figure}
 
-\subsection{IOU, TPR and F\textsubscript{1} score}
+\subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
 
 \begin{wraptable}{r}{0.4\textwidth}
   \vspace{-2.5em}
@@ -93,9 +93,7 @@ In any detection task, TPR can be a flawed metric to use to define how well a gi
 This is because, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
 As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
 F\textsubscript{1} score is the harmonic mean of sensitivity (i.e. TPR) and precision.
-The F\textsubscript{1} scores of `face.cpp' on each of the NoEntry\textasteriskcentered.jpg images are shown in Table \ref{tab:face}.
-
-
+Table \ref{tab:face} displays the F\textsubscript{1} score and TPR that `face.cpp' achieved on each of the NoEntry\textasteriskcentered.jpg images
 
 \clearpage
 
