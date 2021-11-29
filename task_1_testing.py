@@ -1,20 +1,24 @@
 import cv2
 
-from task_2_viola_jones import ViolaJonesDetector
-
 IOU_THRESHOLD = 0.5
 
 class Testing():
     def __init__(self, num):
         self.num = num
-        self.detector = ViolaJonesDetector(f"No_entry/NoEntry{self.num}.bmp")
+        self.image = cv2.imread(f"No_entry/NoEntry{self.num}.bmp", cv2.IMREAD_COLOR)
+        self.face_cpp_boxes = self.get_face_cpp_boxes()
         self.ground_truth_boxes = self.get_ground_truth_boxes()
         self.successful_intersections = self.calculate_successful_intersections()
         self.tpr = self.calculate_tpr()
         self.f1 = self.calculate_f1()
         
+    def get_face_cpp_boxes(self):
+        with open(f"face_cpp_output/boxes/{self.num}.txt") as f:
+            lines = f.readlines()
+        return [tuple(map(int, line.strip().split(" "))) for line in lines]
+
     def get_ground_truth_boxes(self):
-        with open(f"no_entry_sign_ground_truths/{self.num}.txt") as f:
+        with open(f"face_ground_truths/{self.num}.txt") as f:
             lines = f.readlines()
         return [tuple(map(int, line.strip().split(" "))) for line in lines]
 
@@ -22,7 +26,7 @@ class Testing():
         successful_intersections = []
         for x1, y1, w1, h1 in self.ground_truth_boxes:
             potential_intersections = []
-            for x2, y2, w2, h2 in self.detector.objects:
+            for x2, y2, w2, h2 in self.face_cpp_boxes:
                 x_left = max(x1, x2)
                 y_top = max(y1, y2)
                 x_right = min(x1 + w1, x2 + w2)
@@ -50,7 +54,7 @@ class Testing():
 
     def calculate_f1(self):
         true_positives = len(self.successful_intersections)
-        false_positives = len(self.detector.objects) - true_positives
+        false_positives = len(self.face_cpp_boxes) - true_positives
         false_negatives = len(self.ground_truth_boxes) - true_positives
         if true_positives or false_positives or false_negatives:
             f1_score = true_positives / (true_positives + 0.5 * (false_positives + false_negatives))
@@ -59,14 +63,15 @@ class Testing():
         return f1_score
 
     def draw_boxes(self):
-        self.detector.draw_boxes()
+        for x, y, w, h in self.face_cpp_boxes:
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         for x, y, w, h in self.ground_truth_boxes:
-            cv2.rectangle(self.detector.image.image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        # for x, y, w, h in self.successful_intersections:
-        #     cv2.rectangle(self.detector.image.image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        for x, y, w, h in self.successful_intersections:
+            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     def save_image(self):
-        cv2.imwrite(f"task_2_testing_output/{self.num}.jpg", self.detector.image.image)
+        cv2.imwrite(f"task_1_testing_output/{self.num}.jpg", self.image)
 
 if __name__ == "__main__":
     for i in range(0, 16):
