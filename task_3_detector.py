@@ -52,14 +52,14 @@ class ErrorSignDetector():
         return image_normalised.astype(np.uint8)
 
     def save_images(self):
-        cv2.imwrite("task_3_output_images/1_image_grey.jpg", self.image.grey)
-        cv2.imwrite("task_3_output_images/2_dx_display.jpg", self.normalise(self.hough_circles.dx))
-        cv2.imwrite("task_3_output_images/3_dy_display.jpg", self.normalise(self.hough_circles.dy))
-        cv2.imwrite("task_3_output_images/4_gradient_direction.jpg", self.normalise(self.hough_circles.gradient_direction))
-        cv2.imwrite("task_3_output_images/5_gradient_magnitude.jpg", self.normalise(self.hough_circles.gradient_magnitude))
-        cv2.imwrite("task_3_output_images/6_gradient_magnitude_threshold.jpg", self.hough_circles.gradient_magnitude_threshold)
-        cv2.imwrite("task_3_output_images/7_summed_hough_space.jpg", self.normalise(np.sum(self.hough_circles.hough_space, axis = 2)))
-        cv2.imwrite("task_3_output_images/8_output_image.jpg", self.image.image)
+        cv2.imwrite("task_3_detector_output/1_image_grey.jpg", self.image.grey)
+        cv2.imwrite("task_3_detector_output/2_dx_display.jpg", self.normalise(self.hough_circles.dx))
+        cv2.imwrite("task_3_detector_output/3_dy_display.jpg", self.normalise(self.hough_circles.dy))
+        cv2.imwrite("task_3_detector_output/4_gradient_direction.jpg", self.normalise(self.hough_circles.gradient_direction))
+        cv2.imwrite("task_3_detector_output/5_gradient_magnitude.jpg", self.normalise(self.hough_circles.gradient_magnitude))
+        cv2.imwrite("task_3_detector_output/6_gradient_magnitude_threshold.jpg", self.hough_circles.gradient_magnitude_threshold)
+        cv2.imwrite("task_3_detector_output/7_summed_hough_space.jpg", self.normalise(np.sum(self.hough_circles.hough_space, axis = 2)))
+        cv2.imwrite("task_3_detector_output/8_output_image.jpg", self.image.image)
     
 class Image():
     def __init__(self, file):

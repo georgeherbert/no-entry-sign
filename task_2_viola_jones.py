@@ -19,8 +19,8 @@ class ViolaJonesDetector():
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     def save_images(self):
-        cv2.imwrite("task_2_output_images/1_image_grey.jpg", self.image.grey)
-        cv2.imwrite("task_2_output_images/2_output_image.jpg", self.image.image)
+        cv2.imwrite("task_2_viola_jones_output/1_image_grey.jpg", self.image.grey)
+        cv2.imwrite("task_2_viola_jones_output/2_output_image.jpg", self.image.image)
 
 class Image():
     def __init__(self, file):
