@@ -1,3 +1,4 @@
+import numpy as np
 import cv2
 
 IOU_THRESHOLD = 0.5
@@ -74,6 +75,8 @@ class Testing():
         cv2.imwrite(f"task_1_testing_output/{self.num}.jpg", self.image)
 
 if __name__ == "__main__":
+    tprs = []
+    f1s = []
     for i in range(0, 16):
         test = Testing(i)
         test.draw_boxes()
@@ -81,5 +84,13 @@ if __name__ == "__main__":
         print(f"Image {i}")
         print("-" * 10)
         print(f"TPR: {test.tpr}")
+        if tpr := test.tpr != None:
+            tprs.append(test.tpr)
         print(f"F1: {test.f1}")
+        if f1 := test.f1 != None:
+            f1s.append(test.f1)
         print("")
+    print("Average")
+    print("-" * 10)
+    print(f"TPR: {np.mean(tprs)}")
+    print(f"F1: {np.mean(f1s)}")

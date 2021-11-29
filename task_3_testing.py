@@ -1,14 +1,14 @@
 import numpy as np
 import cv2
 
-from task_2_viola_jones import ViolaJonesDetector
+from task_3_detector import ErrorSignDetector
 
 IOU_THRESHOLD = 0.5
 
 class Testing():
     def __init__(self, num):
         self.num = num
-        self.detector = ViolaJonesDetector(f"No_entry/NoEntry{self.num}.bmp")
+        self.detector = ErrorSignDetector(f"No_entry/NoEntry{self.num}.bmp")
         self.ground_truth_boxes = self.get_ground_truth_boxes()
         self.successful_intersections = self.calculate_successful_intersections()
         self.tpr = self.calculate_tpr()
@@ -67,7 +67,7 @@ class Testing():
         #     cv2.rectangle(self.detector.image.image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     def save_image(self):
-        cv2.imwrite(f"task_2_testing_output/{self.num}.jpg", self.detector.image.image)
+        cv2.imwrite(f"task_3_testing_output/{self.num}.jpg", self.detector.image.image)
 
 if __name__ == "__main__":
     tprs = []
