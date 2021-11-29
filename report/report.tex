@@ -7,6 +7,7 @@
 \usepackage{wrapfig}
 \usepackage{lipsum}
 \usepackage{tikz}
+\usepackage{arydshln}
 \usepackage[style = numeric, sorting = none]{biblatex}
  
 \addbibresource{refs.bib}
@@ -60,7 +61,7 @@
   \vspace{-2.5em}
   \begin{center}
   \caption{TPR and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:face}
-  \begin{tabular}{l l l} 
+  \begin{tabular}{l | l l} 
     \hline\hline
     Image & TPR & F\textsubscript{1} score\\
     \hline
@@ -124,6 +125,38 @@ ROC graph
 
 \subsection{Evaluation}
 
+\begin{wraptable}{r}{0.5\textwidth}
+  \vspace{-2.5em}
+  \begin{center}
+  \caption{TPR and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:shape}
+  \begin{tabular}{l | l l | l l} 
+    \hline\hline
+    \multicolumn{1}{l |}{Image} & \multicolumn{2}{| c |}{Result} & \multicolumn{2}{| c}{Difference} \\
+    & TPR & F\textsubscript{1} score & TPR & F\textsubscript{1} score \\
+    \hline
+    NoEntry0.jpg & & & & \\ 
+    NoEntry1.jpg & & & & \\ 
+    NoEntry2.jpg & & & & \\ 
+    NoEntry3.jpg & & & & \\ 
+    NoEntry4.jpg & & & & \\ 
+    NoEntry5.jpg & & & & \\ 
+    NoEntry6.jpg & & & & \\ 
+    NoEntry7.jpg & & & & \\ 
+    NoEntry8.jpg & & & & \\ 
+    NoEntry9.jpg & & & & \\ 
+    NoEntry10.jpg & & & & \\ 
+    NoEntry11.jpg & & & & \\ 
+    NoEntry12.jpg & & & & \\ 
+    NoEntry13.jpg & & & & \\ 
+    NoEntry14.jpg & & & & \\ 
+    NoEntry15.jpg & & & & \\ 
+    \hdashline
+    All images & & & & \\ 
+    \hline
+  \end{tabular}
+  \end{center}
+\end{wraptable} 
+
 \subsection{Detection pipeline}
 
 \begin{figure}[H]
@@ -163,6 +196,8 @@ The rationale behind combining evidence in this way was as follows:
 \item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a lighter area horizontally between two darker areas
 \item Since no entry signs are circles, we could choose to keep only the detected boxes from the Viola-Jones detector that also coincide with a circle
 \end{itemize}
+
+\clearpage
 
 \section{Improving my detector}
 
