@@ -1,15 +1,15 @@
 \documentclass[onecolumn, 11pt, a4paper]{article}
 \usepackage[a4paper, left = 1cm,right = 1cm, top = 1cm, bottom = 1cm, footskip = 0.5cm]{geometry}
-% \usepackage{pgfplots}
-% \usepackage{physics}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{float}
-% \usepackage{titlesec}
 \usepackage{wrapfig}
 \usepackage{lipsum}
+\usepackage[style = numeric, sorting = none]{biblatex}
  
+\addbibresource{refs.bib}
+
 \graphicspath{{./images/}}
 % \pgfplotsset{compat = 1.17}
 
@@ -84,15 +84,18 @@
   \end{center}
 \end{wraptable} 
 
-When assessing the true positive rate (TPR), the first practical difficulty that arises is how to define a bounding box as being positive.
-I opted to define bounding boxes as positive if they had an intersection-over-union (IOU) value of 50\% or greater.
+In an object detection task, the true positive rate (TPR) is the probability that an object will be positively detected.
+However, the first practical difficulty that arises in calculating the TPR is whether or not to define a predicted bounding box as a being a true positive or a false positive.
+I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IoU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
+Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IoU value as being a true positive if there was more than one intersecting detected bounding box.
 
-On any detection task, it is possible to achieve a TPR of 100\% by detecting everything as positive.
-By doing so, it eliminates the chance of there being any false negatives. 
-Since TPR is defined as \[\text{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}}\]
-if you eliminate all false negatives (i.e. $\text{FN} = 0$), the fraction will become
-\[\text{TPR} = \frac{\text{TP}}{\text{TP} + 0} = \frac{\text{TP}}{\text{TP}} = 1\]
-thus providing you with a TPR of 100\%.
+In any detection task, TPR can be a flawed metric to use to define how well a given model performs.
+This is because, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
+As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
+F\textsubscript{1} score is the harmonic mean of sensitivity (i.e. TPR) and precision.
+The F\textsubscript{1} scores of `face.cpp' on each of the NoEntry\textasteriskcentered.jpg images are shown in Table \ref{tab:face}.
+
+
 
 \clearpage
 
@@ -121,8 +124,8 @@ ROC graph
 
 
 \clearpage
-\begin{thebibliography}{9}
-\end{thebibliography}
+
+\printbibliography
     
 
 \end{document}
