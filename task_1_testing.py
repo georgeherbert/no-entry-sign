@@ -67,8 +67,8 @@ class Testing():
             cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         for x, y, w, h in self.ground_truth_boxes:
             cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        for x, y, w, h in self.successful_intersections:
-            cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        # for x, y, w, h in self.successful_intersections:
+        #     cv2.rectangle(self.image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     def save_image(self):
         cv2.imwrite(f"task_1_testing_output/{self.num}.jpg", self.image)
