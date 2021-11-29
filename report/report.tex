@@ -60,27 +60,27 @@
 \begin{wraptable}{r}{0.4\textwidth}
   \vspace{-2.5em}
   \begin{center}
-  \caption{TPR and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:face}
+  \caption{TPR and F\textsubscript{1} score of the frontal face detector}\label{tab:face}
   \begin{tabular}{l | l l} 
     \hline\hline
-    Image & TPR & F\textsubscript{1} score\\
+    Image&TPR&F\textsubscript{1} score\\
     \hline
-    NoEntry0.jpg & Undefined & 0.00 \\ 
-    NoEntry1.jpg & 1.00 & 0.20 \\ 
-    NoEntry2.jpg & 0.25 & 0.18 \\ 
-    NoEntry3.jpg & Undefined & Undefined \\ 
-    NoEntry4.jpg & 1.00 & 0.28 \\ 
-    NoEntry5.jpg & Undefined & 0.00 \\ 
-    NoEntry6.jpg & Undefined & 0.00 \\ 
-    NoEntry7.jpg & 0.50 & 0.22 \\ 
-    NoEntry8.jpg & Undefined & 0.00 \\ 
-    NoEntry9.jpg & Undefined & 0.00 \\ 
-    NoEntry10.jpg & Undefined & 0.00 \\ 
-    NoEntry11.jpg & 0.50 & 0.31 \\ 
-    NoEntry12.jpg & 0.00 & 0.00 \\ 
-    NoEntry13.jpg & Undefined & 0.00 \\ 
-    NoEntry14.jpg & Undefined & 0.00 \\ 
-    NoEntry15.jpg & Undefined & 0.00 \\ 
+    NoEntry0.jpg&Undefined&0.00\\ 
+    NoEntry1.jpg&1.00&0.20\\ 
+    NoEntry2.jpg&0.25&0.18\\ 
+    NoEntry3.jpg&Undefined&Undefined\\ 
+    NoEntry4.jpg&1.00&0.28\\ 
+    NoEntry5.jpg&Undefined&0.00\\ 
+    NoEntry6.jpg&Undefined&0.00\\ 
+    NoEntry7.jpg&0.50&0.22\\ 
+    NoEntry8.jpg&Undefined&0.00\\ 
+    NoEntry9.jpg&Undefined&0.00\\ 
+    NoEntry10.jpg&Undefined&0.00\\ 
+    NoEntry11.jpg&0.50&0.31\\ 
+    NoEntry12.jpg&0.00&0.00\\ 
+    NoEntry13.jpg&Undefined&0.00\\ 
+    NoEntry14.jpg&Undefined&0.00\\ 
+    NoEntry15.jpg&Undefined&0.00\\ 
     \hline
   \end{tabular}
   \end{center}
@@ -117,6 +117,37 @@ ROC graph
 
 \subsection{Testing performance}
 
+\begin{wraptable}{r}{0.4\textwidth}
+  \vspace{-2.5em}
+  \begin{center}
+  \caption{TPR and F\textsubscript{1} score of Viola-Jones no entry sign detector}\label{tab:vj}
+  \begin{tabular}{l | l l} 
+    \hline\hline
+    Image&TPR&F\textsubscript{1} score\\
+    \hline
+    NoEntry0.jpg&0.00&0.00\\ 
+    NoEntry1.jpg&1.00&0.13\\ 
+    NoEntry2.jpg&1.00&0.08\\ 
+    NoEntry3.jpg&0.50&0.15\\ 
+    NoEntry4.jpg&1.00&0.16\\ 
+    NoEntry5.jpg&0.30&0.17\\ 
+    NoEntry6.jpg&0.00&0.00\\ 
+    NoEntry7.jpg&0.00&0.00\\
+    NoEntry8.jpg&0.57&0.62\\ 
+    NoEntry9.jpg&0.00&0.00\\ 
+    NoEntry10.jpg&0.67&0.33\\ 
+    NoEntry11.jpg&0.50&0.11\\ 
+    NoEntry12.jpg&0.38&0.21\\ 
+    NoEntry13.jpg&0.00&0.00\\ 
+    NoEntry14.jpg&0.00&0.00\\ 
+    NoEntry15.jpg&0.50&0.40\\ 
+    \hdashline
+    All images&0.40&0.12\\ 
+    \hline
+  \end{tabular}
+  \end{center}
+\end{wraptable} 
+
 \clearpage
 
 \section{Integration with shape detectors}
@@ -125,33 +156,33 @@ ROC graph
 
 \subsection{Evaluation}
 
-\begin{wraptable}{r}{0.5\textwidth}
+\begin{wraptable}{r}{0.49\textwidth}
   \vspace{-2.5em}
   \begin{center}
-  \caption{TPR and F\textsubscript{1} score of the frontal face detector on each image}\label{tab:shape}
+  \caption{TPR and F\textsubscript{1} score of the Viola-Jones integrated with circle Hough transform no entry sign detector and difference with Viola-Jones no entry sign detector results}\label{tab:shape}
   \begin{tabular}{l | l l | l l} 
     \hline\hline
-    \multicolumn{1}{l |}{Image} & \multicolumn{2}{| c |}{Result} & \multicolumn{2}{| c}{Difference} \\
-    & TPR & F\textsubscript{1} score & TPR & F\textsubscript{1} score \\
+    &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
+    Image&TPR&F\textsubscript{1} score&TPR&F\textsubscript{1} score\\
     \hline
-    NoEntry0.jpg & & & & \\ 
-    NoEntry1.jpg & & & & \\ 
-    NoEntry2.jpg & & & & \\ 
-    NoEntry3.jpg & & & & \\ 
-    NoEntry4.jpg & & & & \\ 
-    NoEntry5.jpg & & & & \\ 
-    NoEntry6.jpg & & & & \\ 
-    NoEntry7.jpg & & & & \\ 
-    NoEntry8.jpg & & & & \\ 
-    NoEntry9.jpg & & & & \\ 
-    NoEntry10.jpg & & & & \\ 
-    NoEntry11.jpg & & & & \\ 
-    NoEntry12.jpg & & & & \\ 
-    NoEntry13.jpg & & & & \\ 
-    NoEntry14.jpg & & & & \\ 
-    NoEntry15.jpg & & & & \\ 
+    NoEntry0.jpg&0.50&0.67&+0.50&+0.67\\
+    NoEntry1.jpg&1.00&1.00&+0.00&+0.87\\
+    NoEntry2.jpg&1.00&1.00&+0.00&+0.92\\
+    NoEntry3.jpg&1.00&0.80&+0.50&+0.65\\
+    NoEntry4.jpg&1.00&1.00&+0.00&+0.84\\
+    NoEntry5.jpg&0.10&0.15&$-0.20$&$-0.02$\\
+    NoEntry6.jpg&0.50&0.67&+0.50&+0.67\\
+    NoEntry7.jpg&0.00&0.00&+0.00&+0.00\\
+    NoEntry8.jpg&0.43&0.60&$-0.14$&$-0.02$\\
+    NoEntry9.jpg&1.00&1.00&+1.00&+1.00\\
+    NoEntry10.jpg&0.67&0.80&+0.00&+0.47\\
+    NoEntry11.jpg&0.50&0.67&+0.00&+0.56\\
+    NoEntry12.jpg&0.13&0.22&$-0.25$&+0.01\\
+    NoEntry13.jpg&0.00&0.00&+0.00&+0.00\\
+    NoEntry14.jpg&0.00&0.00&+0.00&+0.00\\
+    NoEntry15.jpg&1.00&1.00&+0.50&+0.60\\
     \hdashline
-    All images & & & & \\ 
+    All images&0.42&0.56&+0.02&+0.45\\
     \hline
   \end{tabular}
   \end{center}
