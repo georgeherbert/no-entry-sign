@@ -6,15 +6,20 @@
 \usepackage{float}
 \usepackage{wrapfig}
 \usepackage{lipsum}
+\usepackage{tikz}
 \usepackage[style = numeric, sorting = none]{biblatex}
  
 \addbibresource{refs.bib}
 
 \graphicspath{{./images/}}
-% \pgfplotsset{compat = 1.17}
 
-% \titlespacing\section{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
-% \titlespacing\subsection{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, text width=3cm, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, text width=5.2cm, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, aspect = 1.5, minimum width=3cm, minimum height=1cm, text centered, text width=4cm, draw=black, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+% \pgfplotsset{compat = 1.17}
 
 \author{
   % George Herbert\\
@@ -27,10 +32,6 @@
 \begin{document}
 
 \maketitle
-
-% \begin{abstract}
-%     Abstract
-% \end{abstract}
 
 \section{The Viola-Jones object detector}
 
@@ -115,7 +116,53 @@ ROC graph
 
 \subsection{Testing performance}
 
+\clearpage
+
 \section{Integration with shape detectors}
+
+\subsection{Hough details}
+
+\subsection{Evaluation}
+
+\subsection{Detection pipeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance = 1.5cm]
+  \node (start) [startstop] {Start};
+  \node (hc) [process, below of = start] {Detect objects with\\circle Hough transform};
+  \node (vj) [process, below of = hc] {Detect objects with Viola-Jones detector};
+  \node (cartesian) [process, below of = vj] {Create cartesian product of objects from the two detectors};
+  \node (iou) [decision, below of = cartesian, xshift = 6.25cm, yshift = 4cm] {IoU of combination greater than 50\%?};
+  \node (done) [decision, right of = iou, xshift = 5cm] {Have all combinations been tried?};
+  \node (list) [process, below of = iou, yshift = -1.5cm] {Set Hough circle bounding box as a positive no entry sign};
+  \node (stop) [startstop, below of = done, yshift = -1.5cm] {Stop};
+  \draw [arrow] (start) -- (hc);
+  \draw [arrow] (hc) -- (vj);
+  \draw [arrow] (vj) -- (cartesian);
+  \draw [thick,-](0, -5.05) -- (0, -5.55);
+  \draw [thick,-](0, -5.55) -- (3, -5.55);
+  \draw [thick,-](3, -5.55) -- (3, 0.5);
+  \draw [thick,-stealth](3, 0.5) -- node[anchor = north] {First combination} (6.25, 0.5);
+  \draw [thick,-stealth](6.25, 0.5) -- (6.25, -0.05);
+  \draw [arrow] (iou) -- node[anchor = west] {Yes} (list);
+  \draw [arrow] (iou) -- node[anchor = south] {No} (done);
+  \draw [thick,-](9, -5.05) -- (9.85, -5.05);
+  \draw [thick,-stealth](9.85, -5.05) -- (9.85, -2);
+  \draw [thick,-](12.75, -0.1) -- node[anchor = west] {No} (12.75, 0.5);
+  \draw [thick,-stealth](12.75, 0.5) -- node[anchor = north] {Next combination} (6.25, 0.5);
+  \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
+\end{tikzpicture}
+\caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough transform}
+\label{fig:flow}
+\end{figure}
+
+The rationale behind combining evidence in this way was as follows:
+\begin{itemize}
+\item The Viola-Jones detector was approximately 50\% effective at detecting no entry signs, but had a large number of false positives
+\item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a lighter area horizontally between two darker areas
+\item Since no entry signs are circles, we could choose to keep only the detected boxes from the Viola-Jones detector that also coincide with a circle
+\end{itemize}
 
 \section{Improving my detector}
 

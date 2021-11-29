@@ -137,8 +137,8 @@ class ViolaJonesDetector():
         self.image = image
         self.cascade = cv2.CascadeClassifier("training/NoEntrycascade/cascade.xml")
         self.objects = self.cascade.detectMultiScale(
-            self.image.grey,
-            scaleFactor = 1.1,
+            cv2.equalizeHist(self.image.grey),
+            scaleFactor = 1.01,
             minNeighbors = 1,
             flags = cv2.CASCADE_SCALE_IMAGE,
             minSize = (10, 10),
