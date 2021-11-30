@@ -54,6 +54,11 @@
   \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
 \end{figure}
 
+In object detection tasks, ground truth bounding boxes assist in determining the accuracy of a detection algorithm, and help to visualise how it performs.
+Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the faces detected by \texttt{face.cpp}, which implements the Viola-Jones object detection framework, in green.
+
+For the Viola-Jones frontal face detector, implemented in \texttt{face.cpp}, the ground 
+
 \subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
 
 \begin{table}[htbp]
@@ -160,9 +165,9 @@ ROC graph
   \hfill
   \subfloat[\texttt{NoEntry15.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/15_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/15_hough_space.jpg}}
-  \hfill
   \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/5_hough_space.jpg}}
+  \hfill
+  \subfloat[\texttt{NoEntry15.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/15_hough_space.jpg}}
   \caption{Two examples of no entry sign images which exhibit the merits and limitations of my implementation}\label{fig:hough_details}
 \end{figure}
 
