@@ -150,19 +150,20 @@ ROC graph
 \section{Integration with shape detectors}
 
 \begin{figure}[H]
+  \vspace{-2em}
   \centering
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/task_3_5.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_5.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/task_3_15.jpg}}
+  \subfloat[\texttt{NoEntry15.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_15.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/15_hough_space.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/5_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/5_gradient_magnitude_threshold.jpg}}
+  \subfloat[\texttt{NoEntry15.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/15_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/5_hough_space.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/15_hough_space.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg}]{\includegraphics[width = 0.24\textwidth]{images/15_gradient_magnitude_threshold.jpg}}
-  \caption{Two examples of no entry sign images which exhibit the merit and limitations of my implementation, and their corresponding gradient magnitude threshold and 2D Hough space images}\label{fig:hough_details}
+  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/5_hough_space.jpg}}
+  \caption{Two examples of no entry sign images which exhibit the merits and limitations of my implementation}\label{fig:hough_details}
 \end{figure}
 
 \subsection{Evaluation}
@@ -212,7 +213,7 @@ Figure \ref{fig:flow} outlines the way I combined evidence in my algorithm.
 The rationale behind this was as follows:
 \begin{itemize}
 \itemsep 0em 
-\item The Viola-Jones detector detected approximately 50\% of no entry signs, but had a large number of false positives
+\item The Viola-Jones detector detected approximately 40\% of no entry signs, but had a large number of false positives
 \item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a light bar horizontally between two dark bars
 \item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IoU with a Viola-Jones bounding box of greater than 50\%
 \end{itemize}
