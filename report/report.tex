@@ -60,7 +60,7 @@ Figure \ref{fig:face} displays six images, with their ground truth bounding boxe
 \subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
 
 True positive rate (TPR) is a popular metric used to assess the performance of an object detection algorithm.
-TPR represents the probability that the object an algorithm is detecting will be positively detected, and is given by the formula:
+The TPR is the proportion of objects that an algorithm is attempting to detect that are actually detected, and is given by the formula:
 \[
   \textrm{TPR} = \frac{\textrm{TP}}{\textrm{TP + FN}}
 \]
@@ -80,7 +80,7 @@ This is because, firstly, the TPR can be usually be artificially increased simpl
 Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
 
 As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
-F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision (i.e. the probability that a detected positive is actually positive), and is calculated as follows:
+F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision (i.e. the proportion of predicted positives that are actually positive), and is calculated as follows:
 \[
   \textrm{F\textsubscript{1}} = \frac{\textrm{TP}}{\textrm{TP} + \frac{1}{2}(\textrm{FP} + \textrm{FN})}
 \]
@@ -123,7 +123,8 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 
 \subsection{Training performance}
 
-ROC graph
+In the Viola-Jones training process, the false positive rate (FPR) represents the proportion of images not containing the object being detected containing a predicted positive.
+
 % \begin{tikzpicture}
 % \begin{axis}[]
 % \addplot+[
