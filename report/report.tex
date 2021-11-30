@@ -15,8 +15,8 @@
 \graphicspath{{./images/}}
 
 \usetikzlibrary{shapes.geometric, arrows, calc}
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=0cm, minimum height=0cm, text centered, text width=2cm, draw=black, fill=white!30]
-\tikzstyle{process} = [rectangle, minimum width=0cm, minimum height=0cm, text centered, text width=5.2cm, draw=black, fill=white!30]
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=0cm, minimum height=0cm, text centered, text width=1cm, draw=black, fill=white!30]
+\tikzstyle{process} = [rectangle, minimum width=0cm, minimum height=0cm, text centered, text width=4.8cm, draw=black, fill=white!30]
 \tikzstyle{decision} = [diamond, aspect = 1.25, minimum width=0cm, minimum height=0cm, text centered, text width=3cm, draw=black, fill=white!30, inner sep = -1.5ex]
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
@@ -219,29 +219,31 @@ The rationale behind this was as follows:
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[node distance = 1.5cm]
+\begin{tikzpicture}[node distance = 1.25cm]
   \node (start) [startstop] {Start};
-  \node (hough) [process, below of = start] {Create set of bounding boxes of circles detetced with circle Hough transform};
-  \node (vj) [process, below of = hough, yshift = -1em] {Create set of no entry sign bounding boxes using Viola-Jones detector};
-  \node (cartesian) [process, below of = vj] {Create cartesian product of bounding boxes from both sets};
-  \node (for) [process, below of = cartesian] {For each combination of bounding boxes in the cartesian product};
+  \node (hough) [process, below of = start] {Create set of bounding boxes of circles from the circle Hough transform};
+  \node (vj) [process, below of = hough, yshift = -1.2em] {Create set of bounding boxes of no entry signs from Viola-Jones detector};
+  \node (empty) [process, below of = vj, yshift = -0.6em] {Create empty list for positive no entry signs};
+  \node (cartesian) [process, below of = empty, yshift = -0.1em] {Create cartesian product of bounding boxes from both sets};
+  \node (for) [process, below of = cartesian, yshift = -0.8em] {For each combination of bounding boxes in the cartesian product};
   \node (iou) [decision, below of = for, yshift = -5em] {IoU of\\combination greater\\than 50\%?};
-  \node (list) [process, below of = iou, yshift = -3em] {Add circle bounding box to list of positive no entry signs};
-  \node (done) [decision, right of = iou, xshift = 10em] {Has the IoU\\of all combinations\\been\\calculated?};
-  \node (stop) [startstop, below of = done, yshift = -2em] {Stop};
+  \node (list) [process, below of = iou, yshift = -3.3em] {Add circle bounding box to list of positive no entry signs};
+  \node (done) [decision, right of = iou, xshift = 10em] {Have the\\IoUs of all\\combinations been\\calculated?};
+  \node (stop) [startstop, below of = done, yshift = -2.65em] {Stop};
   \draw [arrow] (start) -- (hough);
   \draw [arrow] (hough) -- (vj);
-  \draw [arrow] (vj) -- (cartesian);
+  \draw [arrow] (vj) -- (empty);
+  \draw [arrow] (empty) -- (cartesian);
   \draw [arrow] (cartesian) -- (for);
   \draw [arrow] (for) -- node[anchor = east, text width = 2cm] {\centering First\\combination} (iou);
   \draw [arrow] (iou) -- node[anchor = east] {Yes} (list);
   \draw [arrow] (list.east) -| (done.west);
-  \draw let \p1 = (done.north) in [thick,-] (done.north) -- node[anchor = west] {No} (\x1, -7.5);
-  \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -7.5) -- node[anchor = north] {Next combination} (\x2, -7.5);
-  \draw [arrow] (done) -- (stop);
+  \draw let \p1 = (done.north) in [thick,-] (done.north) -- node[anchor = west] {No} (\x1, -8.25);
+  \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -8.25) -- node[anchor = north] {Next combination} (\x2, -8.25);
+  \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
 \end{tikzpicture}
 \caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough transform}
-\label{fig:flow2}
+\label{fig:flow}
 \end{figure}
 
 \clearpage
