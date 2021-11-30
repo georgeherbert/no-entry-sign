@@ -80,7 +80,7 @@ This is because, firstly, the TPR can be usually be artificially increased simpl
 Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
 
 As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
-F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision, and is calculated as follows:
+F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision (i.e. the probability that a detected positive is actually positive), and is calculated as follows:
 \[
   \textrm{F\textsubscript{1}} = \frac{\textrm{TP}}{\textrm{TP} + \frac{1}{2}(\textrm{FP} + \textrm{FN})}
 \]
