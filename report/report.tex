@@ -54,12 +54,40 @@
   \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
 \end{figure}
 
-In object detection tasks, ground truth bounding boxes assist in determining the accuracy of a detection algorithm, and help to visualise how it performs.
-Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the faces detected by \texttt{face.cpp}, which implements the Viola-Jones object detection framework, in green.
-
-For the Viola-Jones frontal face detector, implemented in \texttt{face.cpp}, the ground 
+In an object detection task, ground truth bounding boxes assist in determining the accuracy of the detection algorithm, and help to visualise how well it performs.
+Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the frontal faces detected by \texttt{face.cpp}, which implements the Viola-Jones object detection framework, in green.
 
 \subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
+
+True positive rate (TPR) is a popular metric used to assess the performance of an object detection algorithm.
+TPR represents the probability that the object an algorithm is detecting will be positively detected, and is given by the formula:
+\[
+  \textrm{TPR} = \frac{\textrm{TP}}{\textrm{TP + FN}}
+\]
+where TP is the number of true positives, and FN is the number of false negatives.
+
+The first practical difficulty that arises in calculating the TPR is whether or not to define a predicted bounding box as a being a true positive or a false positive.
+I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IoU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
+For two bounding boxes $A$ and $B$, the IoU is calculated as follows:
+\[
+  \textrm{IoU}(A, B) = \frac{|A \cap B|}{|A \cup B|}
+\]
+where $|A \cap B|$ is the area of intersection, and $|A \cup B|$ is the area of union.
+Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IoU value as being a true positive if there was more than one intersecting detected bounding box.
+
+In any detection task, TPR can be a flawed metric to use to define how well a given model performs.
+This is because, firstly, the TPR can be usually be artificially increased simply by lowering the IoU threshold, without the model actually performing any better in reality.
+Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
+
+As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
+F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision, and is calculated as follows:
+\[
+  \textrm{F\textsubscript{1}} = \frac{\textrm{TP}}{\textrm{TP} + \frac{1}{2}(\textrm{FP} + \textrm{FN})}
+\]
+where FP is the number of false positives. 
+
+Table \ref{tab:face} displays the F\textsubscript{1} score and TPR that \texttt{face.cpp} achieved on each of the \texttt{NoEntry\textasteriskcentered.jpg} images.
+Due to the formulas for TPR and F\textsubscript{1} score, many of the values are undefined since division by zero yields an undefined result.
 
 \begin{table}[htbp]
   \begin{center}
@@ -88,17 +116,6 @@ For the Viola-Jones frontal face detector, implemented in \texttt{face.cpp}, the
   \end{tabular}
   \end{center}
 \end{table} 
-
-In an object detection task, the true positive rate (TPR) is the probability that an object will be positively detected.
-However, the first practical difficulty that arises in calculating the TPR is whether or not to define a predicted bounding box as a being a true positive or a false positive.
-I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IoU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
-Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IoU value as being a true positive if there was more than one intersecting detected bounding box.
-
-In any detection task, TPR can be a flawed metric to use to define how well a given model performs.
-This is because, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
-As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
-F\textsubscript{1} score is the harmonic mean of sensitivity (i.e. TPR) and precision.
-Table \ref{tab:face} displays the F\textsubscript{1} score and TPR that `face.cpp' achieved on each of the \texttt{NoEntry\textasteriskcentered.jpg} images
 
 \clearpage
 
@@ -188,14 +205,14 @@ ROC graph
     \texttt{NoEntry4.jpg}&1.00&1.00&$\pm0.00$&+0.84\\
     \texttt{NoEntry5.jpg}&0.10&0.15&$-0.20$&$-0.02$\\
     \texttt{NoEntry6.jpg}&0.50&0.67&+0.50&+0.67\\
-    \texttt{NoEntry7.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\\
+    \texttt{NoEntry7.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\
     \texttt{NoEntry8.jpg}&0.43&0.60&$-0.14$&$-0.02$\\
     \texttt{NoEntry9.jpg}&1.00&1.00&+1.00&+1.00\\
     \texttt{NoEntry10.jpg}&0.67&0.80&$\pm0.00$&+0.47\\
     \texttt{NoEntry11.jpg}&0.50&0.67&$\pm0.00$&+0.56\\
     \texttt{NoEntry12.jpg}&0.13&0.22&$-0.25$&+0.01\\
-    \texttt{NoEntry13.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\\
-    \texttt{NoEntry14.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\\
+    \texttt{NoEntry13.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry14.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\
     \texttt{NoEntry15.jpg}&1.00&1.00&+0.50&+0.60\\
     \hdashline
     All images&0.42&0.56&+0.02&+0.45\\
