@@ -125,7 +125,6 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 \subsection{Training performance}
 
 \begin{figure}[h]
-  %0 - aramente   1 - Às vezes   2 - Quase sempre   4 - Sempre
   \pgfplotstableread{
   0 1        1
   1 1        0.0214601
@@ -144,7 +143,6 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
     xlabel = {Training Stage},
     xtick = data,
     xticklabels = {0, 1, 2},
-    % legend style={at={(0.5,-3.75em)},anchor=north, draw=none, anchor=north, legend columns=-1, legend  style={/tikz/every even column/.append style={column sep=0.5cm}}}
   ]
   \addplot[draw=black,fill=green!50] table[x index=0,y index=1] \dataset; %ano de 2013-2014
   \addplot[draw=black,fill=red!50] table[x index=0,y index=2] \dataset; %ano de 2012-2013
@@ -158,8 +156,17 @@ During the Viola-Jones no entry sign training process, the false positive rate (
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
 Throughout each stage, the TPR remains to 100\%, while the FPR exponentially decreases.
  
-
 \subsection{Testing performance}
+
+\begin{figure}[htbp]
+  \centering
+  \subfloat[\texttt{NoEntry2.jpg}]{\includegraphics[width = 0.3115\textwidth]{images/task_2_2.jpg}\label{fig:face1}}
+  \hfill
+  \subfloat[\texttt{NoEntry8.jpg}]{\includegraphics[width = 0.1695\textwidth]{images/task_2_8.jpg}\label{fig:face2}}
+  \hfill
+  \subfloat[\texttt{NoEntry3.jpg}]{\includegraphics[width = 0.49\textwidth]{images/task_2_3.jpg}\label{fig:face4}}
+  \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
+\end{figure}
 
 \begin{table}[htbp]
   \begin{center}
