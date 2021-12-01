@@ -77,14 +77,9 @@ if __name__ == "__main__":
         test = Testing(i)
         test.draw_boxes()
         test.save_image()
-        print(f"Image {i}")
-        print("-" * 10)
-        print(f"TPR: {test.tpr}")
-        print(f"F1: {test.f1}\n")
+        print(i, test.tpr, test.f1)
         tp += test.tp
         fn += test.fn
         fp += test.fp
-    print("Average")
-    print("-" * 10)
-    print(f"TPR: {tp / (tp + fn)}")
-    print(f"F1: {tp / (tp + 0.5 * (fp + fn))}")
+    print("")
+    print(tp / (tp + fn), tp / (tp + 0.5 * (fp + fn)))
