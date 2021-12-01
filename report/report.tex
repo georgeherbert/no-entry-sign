@@ -127,9 +127,9 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 \begin{figure}[h]
   %0 - aramente   1 - Às vezes   2 - Quase sempre   4 - Sempre
   \pgfplotstableread{
-  0 100        100
-  1 100        1.92197
-  2 100        0.067337
+  0 1        1
+  1 1        0.0192197
+  2 1        0.00067337
   }\dataset
   \begin{tikzpicture}
   \begin{axis}[
@@ -137,7 +137,7 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
     ymode = log,
     log origin = infty,
     width = 0.49\textwidth,
-    ymax = 100,
+    ymax = 1,
     enlarge x limits = 0.25,
     enlarge y limits = 0.05,
     ylabel = {Rate (\%)},
