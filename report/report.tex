@@ -52,7 +52,7 @@
   \subfloat[\texttt{NoEntry7.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry7.jpg}\label{fig:face7}}
   \hfill
   \subfloat[\texttt{NoEntry11.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry11.jpg}\label{fig:face11}}
-  \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
+  \caption{Six images with the bounding boxes of the ground truths in red and actually detected instances in green from the frontal face detector}\label{fig:face}
 \end{figure}
 
 In an object detection task, ground truth bounding boxes assist in determining the accuracy of the detection algorithm, and help to visualise how well it performs.
@@ -149,24 +149,42 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
   \legend{TPR, FPR}
   \end{axis}
   \end{tikzpicture}
-  \caption{TPR and FPR of stages in Viola-Jones no entry sign training process}\label{vj_training}
+  \caption{TPR and FPR of stages in the Viola-Jones no entry sign training process}\label{vj_training}
 \end{figure}
 
 During the Viola-Jones no entry sign training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
-Throughout each stage, the TPR remains to 100\%, while the FPR exponentially decreases.
+At each successive stage, the TPR remains at 100\%, while the FPR decreases drastically.
  
 \subsection{Testing performance}
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[\texttt{NoEntry2.jpg}]{\includegraphics[width = 0.3115\textwidth]{images/task_2_2.jpg}\label{fig:face1}}
+  \subfloat[\texttt{NoEntry2.jpg}]{\includegraphics[width = 0.3115\textwidth]{images/task_2_2.jpg}\label{fig:task_2_2}}
   \hfill
-  \subfloat[\texttt{NoEntry8.jpg}]{\includegraphics[width = 0.1695\textwidth]{images/task_2_8.jpg}\label{fig:face2}}
+  \subfloat[\texttt{NoEntry8.jpg}]{\includegraphics[width = 0.1695\textwidth]{images/task_2_8.jpg}\label{fig:task_2_8}}
   \hfill
-  \subfloat[\texttt{NoEntry3.jpg}]{\includegraphics[width = 0.49\textwidth]{images/task_2_3.jpg}\label{fig:face4}}
-  \caption{Six images with the bounding boxes of the ground truths (in red) and actually detected instances (in green) from the frontal face detector}\label{fig:face}
+  \subfloat[\texttt{NoEntry3.jpg}]{\includegraphics[width = 0.49\textwidth]{images/task_2_3.jpg}\label{fig:task_2_3}}
+  \caption{Three images with the bounding boxes of the ground truths in red and actually detected instances in green from the Viola-Jones no entry sign detector}\label{fig:task_2}
 \end{figure}
+
+Figure \ref{fig:task_2} contains three images with ground truth bounding boxes in red, and detected bounding boxes from the Viola-Jones implementation in green.
+The implementation works relatively well, achieving a TPR of 0.44 and an F\textsubscript{1} score of 0.48, as shown in Table \ref{tab:vj}.
+However, the implementation has its shortcomings.
+When tested, the Viola-Jones implementation detects a large number of false positives.
+Upon inspection, this primarily occurs in regions containing a slightly lighter strip horizontally between two darker strips.
+For example, the turn left sign in Figure \ref{fig:task_2_3} has been incorrectly detected in this manner.
+
+The TPR on the test data is significantly lower than on the training data.
+One reason for this is likely due to the differing appearances of no entry signs in the test data.
+The Viola-Jones implementation was trained using a single no entry sign with different perspective transformations applied to it to create a collection of artificial positives.
+This approach works best for completely rigid objects \cite{training}. 
+However, due to the slightly differing appearances of the no entry signs between countries, the positives in our test images are not.
+Additionally, we are only testing our implementation on 16 images.
+To get a more accurate idea of the true TPR and F\textsubscript{1} score, we would need to test our implementation on a larger test set.
+
+
+
 
 \begin{table}[htbp]
   \begin{center}
@@ -218,10 +236,8 @@ Throughout each stage, the TPR remains to 100\%, while the FPR exponentially dec
   \subfloat[\texttt{NoEntry6.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/6_hough_space.jpg}}
   \hfill
   \subfloat[\texttt{NoEntry2.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/2_hough_space.jpg}}
-  \caption{Two examples of no entry sign images}\label{fig:hough_details}
+  \caption{Two no entry sign images at various stages of the integrated implementation}\label{fig:hough_details}
 \end{figure}
-
-Figure \ref{fig:hough_details} contains two examples of no entry sign images that best exhibit the merits and limitations of my integrated implementation.
 
 \subsection{Evaluation}
 
