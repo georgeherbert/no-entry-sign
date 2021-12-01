@@ -68,16 +68,16 @@ The TPR is the proportion of objects that an algorithm is attempting to detect t
 where TP is the number of true positives, and FN is the number of false negatives.
 
 The first practical difficulty that arises in calculating the TPR is whether or not to define a predicted bounding box as a being a true positive or a false positive.
-I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IoU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
-For two bounding boxes $A$ and $B$, the IoU is calculated as follows:
+I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IOU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
+For two bounding boxes $A$ and $B$, the IOU is calculated as follows:
 \[
-  \textrm{IoU}(A, B) = \frac{|A \cap B|}{|A \cup B|}
+  \textrm{IOU}(A, B) = \frac{|A \cap B|}{|A \cup B|}
 \]
 where $|A \cap B|$ is the area of intersection, and $|A \cup B|$ is the area of union.
-Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IoU value as being a true positive if there was more than one intersecting detected bounding box.
+Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IOU value as being a true positive if there was more than one intersecting detected bounding box.
 
 In any detection task, TPR can be a flawed metric to use to define how well a given model performs.
-This is because, firstly, the TPR can be usually be artificially increased simply by lowering the IoU threshold, without the model actually performing any better in reality.
+This is because, firstly, the TPR can be usually be artificially increased simply by lowering the IOU threshold, without the model actually performing any better in reality.
 Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
 
 As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
@@ -89,7 +89,7 @@ where FP is the number of false positives.
 
 \begin{table}[htbp]
   \begin{center}
-  \caption{TPR and F\textsubscript{1} score of the frontal face detector}\label{tab:face}
+  \caption{TPRs and F\textsubscript{1} scores of the frontal face detector}\label{tab:face}
   \begin{tabular}{l | l l} 
     \hline\hline
     Image&TPR&F\textsubscript{1} Score\\
@@ -161,7 +161,7 @@ Figure \ref{vj_training} displays the TPR and FPR at each stage of the training 
 
 \begin{table}[htbp]
   \begin{center}
-  \caption{TPR and F\textsubscript{1} score of Viola-Jones no entry sign detector}\label{tab:vj}
+  \caption{TPRs and F\textsubscript{1} scores of Viola-Jones no entry sign detector}\label{tab:vj}
   \begin{tabular}{l | l l} 
     \hline\hline
     Image&TPR&F\textsubscript{1} Score\\
@@ -193,28 +193,53 @@ Figure \ref{vj_training} displays the TPR and FPR at each stage of the training 
 
 \section{Integration with shape detectors}
 
+\subsection{Hough Details}
+
 \begin{figure}[H]
-  \vspace{-2em}
+  \vspace{-4.5em}
   \centering
-  \subfloat[\texttt{NoEntry5.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_5.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_6.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_15.jpg}}
+  \subfloat[\texttt{NoEntry15.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_4.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/5_gradient_magnitude_threshold.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/6_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/15_gradient_magnitude_threshold.jpg}}
+  \subfloat[\texttt{NoEntry15.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/4_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/5_hough_space.jpg}}
+  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/6_hough_space.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/15_hough_space.jpg}}
-  \caption{Two examples of no entry sign images which exhibit the merits and limitations of my implementation}\label{fig:hough_details}
+  \subfloat[\texttt{NoEntry15.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/4_hough_space.jpg}}
+  \caption{Two examples of no entry sign images}\label{fig:hough_details}
 \end{figure}
+
+Figure \ref{fig:hough_details} contains two examples of no entry sign images that best exhibit the merits and limitations of my integrated implementation.
 
 \subsection{Evaluation}
 
-\begin{table}[htbp]
+Table \ref{tab:shape} displays the TPR and F\textsubscript{1} score of the integrated implementation, as well as the differences compared with the Viola-Jones implementation.
+The key merits and shortcomings include:
+\begin{itemize}
+\itemsep 0em 
+\item A significantly larger F\textsubscript{1} score, primarily as a result of increasing the precision; achieved by only defining an object detected by the Viola-Jones detector as positive if it has an IOU value with a  bounding box from the circle Hough transform greater than 50\%
+\item A small improvement to the TPR score, by reducing the minimum  number of neighbours allowing for more true positives to be identified (the extra false positives were `filtered out' by utilising the circle Hough transform)
+\item If a no entry sign is positively detected by one of the detectors, but not the other, it is not positively detected by the integrated implementation
+\item A significantly slower implementation, since the circle Hough transform takes longer to calculate
+\end{itemize}
+
+\subsection{Detection pipeline}
+
+Figure \ref{fig:flow} outlines the way I combined evidence in my algorithm.
+The rationale behind this was as follows:
+\begin{itemize}
+\itemsep 0em 
+\item The Viola-Jones detector detected 44\% of no entry signs, but had a low level of precision
+\item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a light bar horizontally between two dark bars
+\item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IOU with a Viola-Jones bounding box of greater than 50\% (i.e. they are likely detecting the same object)
+\end{itemize}
+
+\begin{table}[H]
   \begin{center}
-  \caption{TPR and F\textsubscript{1} score of the Viola-Jones integrated with circle Hough transform no entry sign detector and difference with Viola-Jones no entry sign detector results}\label{tab:shape}
+  \caption{TPRs and F\textsubscript{1} scores of the integrated implementation}\label{tab:shape}
   \begin{tabular}{l | l l | l l} 
     \hline\hline
     &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
@@ -243,27 +268,9 @@ Figure \ref{vj_training} displays the TPR and FPR at each stage of the training 
   \end{center}
 \end{table} 
 
-Table \ref{tab:shape} displays the TPR and F\textsubscript{1} score of this implementation, as well as the difference compared with the Viola-Jones implementation.
-The key merits and shortcomings include:
-\begin{itemize}
-\itemsep 0em 
-\item A vastly improved F\textsubscript{1} score, as a result of only defining no entry signs detected by the Viola-Jones detector as positive if accompanied by a corresponding circle in the circle Hough transform
-\item No real improvement to the TPR score, as essentially no extra no entry signs can be detected due to the algorithm used to integrate the two detectors
-\end{itemize}
-
-\subsection{Detection pipeline}
-
-Figure \ref{fig:flow} outlines the way I combined evidence in my algorithm.
-The rationale behind this was as follows:
-\begin{itemize}
-\itemsep 0em 
-\item The Viola-Jones detector detected approximately 40\% of no entry signs, but had a large number of false positives
-\item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a light bar horizontally between two dark bars
-\item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IoU with a Viola-Jones bounding box of greater than 50\%
-\end{itemize}
-
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
+\resizebox{0.375\textwidth}{!}{
 \begin{tikzpicture}[node distance = 1.25cm]
   \node (start) [startstop] {Start};
   \node (hough) [process, below of = start] {Create set of bounding boxes of circles from the circle Hough transform};
@@ -271,9 +278,9 @@ The rationale behind this was as follows:
   \node (empty) [process, below of = vj, yshift = -0.6em] {Create empty list for positive no entry signs};
   \node (cartesian) [process, below of = empty, yshift = -0.1em] {Create cartesian product of bounding boxes from both sets};
   \node (for) [process, below of = cartesian, yshift = -0.8em] {For each combination of bounding boxes in the cartesian product};
-  \node (iou) [decision, below of = for, yshift = -5em] {IoU of\\combination greater\\than 50\%?};
+  \node (iou) [decision, below of = for, yshift = -5em] {IOU of\\combination greater\\than 50\%?};
   \node (list) [process, below of = iou, yshift = -3.3em] {Add circle bounding box to list of positive no entry signs};
-  \node (done) [decision, right of = iou, xshift = 10em] {Have the\\IoUs of all\\combinations been\\calculated?};
+  \node (done) [decision, right of = iou, xshift = 10em] {Have the\\IOUs of all\\combinations been\\calculated?};
   \node (stop) [startstop, below of = done, yshift = -2.65em] {Stop};
   \draw [arrow] (start) -- (hough);
   \draw [arrow] (hough) -- (vj);
@@ -287,6 +294,7 @@ The rationale behind this was as follows:
   \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -8.25) -- node[anchor = north] {Next combination} (\x2, -8.25);
   \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
 \end{tikzpicture}
+}
 \caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough transform}
 \label{fig:flow}
 \end{figure}
