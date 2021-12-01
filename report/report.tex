@@ -8,6 +8,7 @@
 \usepackage{lipsum}
 \usepackage{tikz}
 \usepackage{arydshln}
+\usepackage{pgfplots}
 \usepackage[style = numeric, sorting = none]{biblatex}
  
 \addbibresource{refs.bib}
@@ -20,7 +21,7 @@
 \tikzstyle{decision} = [diamond, aspect = 1.25, minimum width=0cm, minimum height=0cm, text centered, text width=3cm, draw=black, fill=white!30, inner sep = -1.5ex]
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
-% \pgfplotsset{compat = 1.17}
+\pgfplotsset{compat = 1.17}
 
 \author{
   % George Herbert\\
@@ -91,7 +92,7 @@ where FP is the number of false positives.
   \caption{TPR and F\textsubscript{1} score of the frontal face detector}\label{tab:face}
   \begin{tabular}{l | l l} 
     \hline\hline
-    Image&TPR&F\textsubscript{1} score\\
+    Image&TPR&F\textsubscript{1} Score\\
     \hline
     \texttt{NoEntry0.jpg}&Undefined&0.00\\ 
     \texttt{NoEntry1.jpg}&1.00&0.20\\ 
@@ -123,18 +124,38 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 
 \subsection{Training performance}
 
-In the Viola-Jones no entry sign training process, the false positive rate (FPR) is the proportion of negatives incorrectly detected as positives (i.e. no entry signs).
+\begin{figure}[h]
+  %0 - aramente   1 - Às vezes   2 - Quase sempre   4 - Sempre
+  \pgfplotstableread{
+  0 100        100
+  1 100        1.92197
+  2 100        0.067337
+  }\dataset
+  \begin{tikzpicture}
+  \begin{axis}[
+    ybar,
+    ymode = log,
+    log origin = infty,
+    width = 0.49\textwidth,
+    ymax = 100,
+    enlarge x limits = 0.25,
+    enlarge y limits = 0.05,
+    ylabel = {Rate (\%)},
+    xlabel = {Training Stage},
+    xtick = data,
+    xticklabels = {0, 1, 2},
+    % legend style={at={(0.5,-3.75em)},anchor=north, draw=none, anchor=north, legend columns=-1, legend  style={/tikz/every even column/.append style={column sep=0.5cm}}}
+  ]
+  \addplot[draw=black,fill=green!50] table[x index=0,y index=1] \dataset; %ano de 2013-2014
+  \addplot[draw=black,fill=red!50] table[x index=0,y index=2] \dataset; %ano de 2012-2013
+  \legend{TPR, FPR}
+  \end{axis}
+  \end{tikzpicture}
+  \caption{TPR and FPR of stages in Viola-Jones no entry sign training process}\label{vj_training}
+\end{figure}
 
-% \begin{tikzpicture}
-% \begin{axis}[]
-% \addplot+[
-%   only marks,
-%   % mark size=2.9pt
-% ]
-% table[]
-% {fpr_tpr.dat};
-% \end{axis}
-% \end{tikzpicture}
+During the Viola-Jones no entry sign training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
+Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
 
 \subsection{Testing performance}
 
@@ -143,7 +164,7 @@ In the Viola-Jones no entry sign training process, the false positive rate (FPR)
   \caption{TPR and F\textsubscript{1} score of Viola-Jones no entry sign detector}\label{tab:vj}
   \begin{tabular}{l | l l} 
     \hline\hline
-    Image&TPR&F\textsubscript{1} score\\
+    Image&TPR&F\textsubscript{1} Score\\
     \hline
     \texttt{NoEntry0.jpg}&0.00&0.00\\ 
     \texttt{NoEntry1.jpg}&1.00&0.13\\ 
@@ -197,7 +218,7 @@ In the Viola-Jones no entry sign training process, the false positive rate (FPR)
   \begin{tabular}{l | l l | l l} 
     \hline\hline
     &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
-    Image&TPR&F\textsubscript{1} score&TPR&F\textsubscript{1} score\\
+    Image&TPR&F\textsubscript{1} Score&TPR&F\textsubscript{1} Score\\
     \hline
     \texttt{NoEntry0.jpg}&0.50&0.67&+0.50&+0.67\\
     \texttt{NoEntry1.jpg}&1.00&1.00&$\pm0.00$&+0.87\\
