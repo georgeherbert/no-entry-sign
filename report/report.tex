@@ -156,6 +156,8 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 
 During the Viola-Jones no entry sign training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
+Throughout each stage, the TPR remains to 100\%, while the FPR exponentially decreases.
+ 
 
 \subsection{Testing performance}
 
@@ -198,17 +200,17 @@ Figure \ref{vj_training} displays the TPR and FPR at each stage of the training 
 \begin{figure}[H]
   \vspace{-4.5em}
   \centering
-  \subfloat[\texttt{NoEntry5.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_6.jpg}}
+  \subfloat[\texttt{NoEntry6.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_6.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_4.jpg}}
+  \subfloat[\texttt{NoEntry2.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_3_2.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/6_gradient_magnitude_threshold.jpg}}
+  \subfloat[\texttt{NoEntry6.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/6_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/4_gradient_magnitude_threshold.jpg}}
+  \subfloat[\texttt{NoEntry2.jpg} gradient magnitude threshold]{\includegraphics[width = 0.24\textwidth]{images/2_gradient_magnitude_threshold.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry5.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/6_hough_space.jpg}}
+  \subfloat[\texttt{NoEntry6.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/6_hough_space.jpg}}
   \hfill
-  \subfloat[\texttt{NoEntry15.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/4_hough_space.jpg}}
+  \subfloat[\texttt{NoEntry2.jpg} 2D Hough space]{\includegraphics[width = 0.24\textwidth]{images/2_hough_space.jpg}}
   \caption{Two examples of no entry sign images}\label{fig:hough_details}
 \end{figure}
 
@@ -270,13 +272,13 @@ The rationale behind this was as follows:
 
 \begin{figure}[H]
 \centering
-\resizebox{0.375\textwidth}{!}{
+\resizebox{0.45\textwidth}{!}{
 \begin{tikzpicture}[node distance = 1.25cm]
   \node (start) [startstop] {Start};
   \node (hough) [process, below of = start] {Create set of bounding boxes of circles from the circle Hough transform};
-  \node (vj) [process, below of = hough, yshift = -1.2em] {Create set of bounding boxes of no entry signs from Viola-Jones detector};
+  \node (vj) [process, right of = hough, xshift = 11.75em] {Create set of bounding boxes of no entry signs from Viola-Jones detector};
   \node (empty) [process, below of = vj, yshift = -0.6em] {Create empty list for positive no entry signs};
-  \node (cartesian) [process, below of = empty, yshift = -0.1em] {Create cartesian product of bounding boxes from both sets};
+  \node (cartesian) [process, left of = empty, xshift = -11.75em] {Create cartesian product of bounding boxes from both sets};
   \node (for) [process, below of = cartesian, yshift = -0.8em] {For each combination of bounding boxes in the cartesian product};
   \node (iou) [decision, below of = for, yshift = -5em] {IOU of\\combination greater\\than 50\%?};
   \node (list) [process, below of = iou, yshift = -3.3em] {Add circle bounding box to list of positive no entry signs};
@@ -290,8 +292,8 @@ The rationale behind this was as follows:
   \draw [arrow] (for) -- node[anchor = east, text width = 2cm] {\centering First\\combination} (iou);
   \draw [arrow] (iou) -- node[anchor = east] {Yes} (list);
   \draw [arrow] (list.east) -| (done.west);
-  \draw let \p1 = (done.north) in [thick,-] (done.north) -- node[anchor = west] {No} (\x1, -8.25);
-  \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -8.25) -- node[anchor = north] {Next combination} (\x2, -8.25);
+  \draw let \p1 = (done.north) in [thick,-] (done.north) -- node[anchor = west] {No} (\x1, -5.25);
+  \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -5.25) -- node[anchor = north] {Next combination} (\x2, -5.25);
   \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
 \end{tikzpicture}
 }
