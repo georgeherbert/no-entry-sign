@@ -47,6 +47,9 @@ class ErrorSignDetector():
     def distance(self, x1, y1, x2, y2):
         return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
+    def distance_3d(self, x1, y1, z1, x2, y2, z2):
+        return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2)
+
     def draw_boxes(self):
         for x, y, w, h in self.objects:
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -57,10 +60,12 @@ class ErrorSignDetector():
         # for x, y, w, h in self.viola_jones.objects:
         #     cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (255, 255, 0), 1)
 
-
         # for x1, y1, w1, h1, in self.unsuccessful_circles:
         for x1, y1, w1, h1, in self.hough_circles.boxes:
             new_image = self.image.image[y1:y1 + h1, x1: x1 + w1][:]
+
+            new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
+
             radius = int(w1 / 2)
             centre = (int(w1 / 2), int(w1 / 2))
             points_in_circle = []
@@ -70,28 +75,34 @@ class ErrorSignDetector():
                         new_image[y2][x2] = (0, 0, 0)
                     else:
                         points_in_circle.append(list(new_image[y2][x2]))
+            
             points_in_circle = np.array(points_in_circle)
 
-            kmeans = KMeans(n_clusters = 2)
-            kmeans.fit(points_in_circle)
+            ab = points_in_circle[:, 1:]
 
-            # fig = plt.figure()
-            # ax = fig.add_subplot(projection='3d')
-            # ax.scatter(points_in_circle[:, 0], points_in_circle[:, 1], points_in_circle[:, 2], c = kmeans.predict(points_in_circle))
-            # plt.show()
+            kmeans = KMeans(n_clusters = 2)
+            kmeans.fit(ab)
             
             new_image_clustered = np.zeros((w1, h1, 3))
 
-            image_prediction = kmeans.predict(new_image.reshape(w1 * h1, 3)).reshape((w1, h1))
-            
-            # print(np.unique(image_prediction))
+            image_prediction = kmeans.predict(new_image.reshape((w1 * h1, 3))[:, 1:]).reshape(w1, h1)
 
-            new_image_clustered[image_prediction == 0] = kmeans.cluster_centers_[0]
-            new_image_clustered[image_prediction == 1] = kmeans.cluster_centers_[1]
+            new_image_clustered[image_prediction == 0] = np.hstack([100, kmeans.cluster_centers_[0]])
+            new_image_clustered[image_prediction == 1] = np.hstack([100, kmeans.cluster_centers_[1]])
             new_image_clustered = new_image_clustered.astype(np.uint8)
-            print(kmeans.cluster_centers_)
+
+            red_index = np.argmax(kmeans.cluster_centers_.sum(axis = 1))
+            red = kmeans.cluster_centers_[red_index]
+            white = kmeans.cluster_centers_[np.abs(red_index - 1)]
+
+            print("red", red)
+            print("white", white)
+
+            cv2.imshow("", cv2.cvtColor(new_image_clustered, cv2.COLOR_LAB2BGR))
             
-            cv2.imshow("", new_image_clustered)
+
+            
+            # cv2.imshow("", new_image_clustered)
             cv2.waitKey()
 
     def normalise(self, image):
