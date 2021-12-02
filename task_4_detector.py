@@ -59,18 +59,12 @@ class ErrorSignDetector():
 
         # for x1, y1, w1, h1, in self.unsuccessful_circles:
         for x1, y1, w1, h1, in self.hough_circles.boxes:
-            if x1 < 0:
-                x1 = 0
-                w1 += x1
-            if y1 < 0:
-                y1 = 0
-                h1 += y1
-            if x1 + w1 > self.image.width:
-                w1 = self.image.width - x1 - 1
-            if y1 + h1 > self.image.height:
-                h1 = self.image.height - h1 - 1
-
-            new_image = self.image.image[y1:y1 + h1, x1: x1 + w1][:]
+            y1 = max(y1, 0)
+            x1 = max(x1, 0)
+            h1 = min(h1, self.image.height - y1)
+            w1 = min(w1, self.image.width - x1)
+            
+            new_image = self.image.image[y1:y1 + h1, x1:x1 + w1][:]
             new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
 
             radius = int(w1 / 2)
@@ -105,7 +99,11 @@ class ErrorSignDetector():
             print("red", red)
             print("white", white)
 
-            if red[0] > red[1] and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20:
+            ab_clustered = kmeans.predict(ab)
+            red_count = np.count_nonzero(ab_clustered == red_index)
+            white_count = np.count_nonzero(ab_clustered == np.abs(red_index - 1))
+
+            if red[0] > red[1] and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20 and red_count > white_count:
                 print("YES")
             else:
                 print("NO")
