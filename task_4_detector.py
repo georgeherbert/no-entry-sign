@@ -47,9 +47,6 @@ class ErrorSignDetector():
                 unsuccessful_intersections.append((x1, y1, w1, h1))
         return successful_intersections, unsuccessful_intersections
 
-    def distance(self, x1, y1, x2, y2):
-        return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
     def draw_boxes(self):
         for x, y, w, h in self.objects:
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -78,7 +75,11 @@ class Image():
         self.grey = cv2.cvtColor(src = self.image, code = cv2.COLOR_BGR2GRAY)
         self.height, self.width = self.grey.shape
 
-class HoughCirclesDetector():
+class DistanceDetector():
+    def distance(self, x1, y1, x2, y2):
+        return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+class HoughCirclesDetector(DistanceDetector):
     def __init__(self, image):
         self.image = image
         self.dx = cv2.Sobel(self.image.grey, cv2.CV_64F, 1, 0, ksize = 3, scale = 1, delta = 0, borderType = cv2.BORDER_DEFAULT)
@@ -123,9 +124,6 @@ class HoughCirclesDetector():
                         circles.append([x, y, r, self.hough_space[y][x][r]])
         return circles
 
-    def distance(self, x1, y1, x2, y2):
-        return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
     def calculate_circles(self):
         circles = []
         for (x1, y1, r1, w1) in self.calculate_possible_circles():
@@ -156,7 +154,7 @@ class ViolaJonesDetector():
             maxSize = (300, 300)
         )   
 
-class ColourLineDetector():
+class ColourLineDetector(DistanceDetector):
     def __init__(self, image, circles):
         self.image = image
         self.circles = circles
@@ -164,9 +162,6 @@ class ColourLineDetector():
         
     def fit_range(self, x, y, w, h):
         return max(x, 0), max(y, 0), min(w, self.image.width - x), min(h, self.image.height - y)
-
-    def distance(self, x1, y1, x2, y2):
-        return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
     def calculate_circle(self, w, h_fitted, w_fitted, new_image):
         new_image_lab = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
@@ -194,12 +189,9 @@ class ColourLineDetector():
         new_objects = []
         for x, y, w, h, in self.circles:
             x_fitted, y_fitted, w_fitted, h_fitted = self.fit_range(x, y, w, h)
-
             new_image = self.image.image[y_fitted:y_fitted + h_fitted, x_fitted:x_fitted + w_fitted]
             points_in_circle_ab = self.calculate_circle(w, h_fitted, w_fitted, new_image)
-
             red, white, red_count, white_count = self.calculate_red_white(points_in_circle_ab)
-
             if self.distance(*red, 208, 193) < 65 and self.distance(*white, 128, 128) < 15 and red_count > white_count:
                 new_objects.append((x, y, w, h))
         return new_objects
