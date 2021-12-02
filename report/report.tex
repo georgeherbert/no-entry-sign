@@ -328,7 +328,27 @@ The rationale behind this was as follows:
 
 \section{Improving my detector}
 
-\begin{table}[H]
+\subsection{Idea}
+
+The motivation behind the new approach came from identifying the areas whereby the previous approach failed.
+There were several no entry signs that were visually quite clear (i.e. big, no occlusion, etc.), and were identified by the circle Hough transform, but since the Viola-Jones detector did not identify them, they were not positively identified.
+Therefore, to improve the detector, I took every circle rejected by the previous approach, and put them through an extra stage of processing.
+
+The extra stage of processing worked on the principal that every no entry sign shares similar characteristics.
+They contain two colours: red and white; and they have a horizontal bar in the middle.
+To identify the main colours in each circle, my algorithm first transforms the colour space of the pixels within the circle from RGB to CIELAB.
+Since CIELAB uses perceptual brightness $L*$ as one of the values, my algoritm ignores this field and instead focus on the green-red axis $a*$ and the blue-yellow axis $b*$.
+This is an advantage since it enables my algorithm to identify the colours in the no entry signs, despite the lighting levels.
+My algorithm then performs K-means clustering on the $a*$ and $b*$ axes, to identify the two primary colours in each circle.
+Since CIELAB is designed to be perceptually uniform, my algorithm then calculated the Euclidean distance from pure white and pure red to the two cluster centers, to identify whether the primary colours in the circle were red and white.
+If the two primary colours where red and white, and there was more red in the circle than white, my algorithm then performs the line Hough transform on the circle.
+If the circle contains two approximately horizontal parallel lines, the circle is accepted as another positive no entry sign.
+
+\subsection{Visualise}
+
+\subsection{Evaluate}
+
+\begin{table}[htbp]
   \begin{center}
   \caption{TPRs and F\textsubscript{1} scores of the improved implementation and the differences compared to the previous implementation}\label{tab:shape}
   \begin{tabular}{l | l l | l l} 
