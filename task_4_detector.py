@@ -2,7 +2,6 @@ import sys
 import numpy as np
 import cv2
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 
 MINIMUM_RADIUS = 10
 MAXIMUM_RADIUS = 110
@@ -18,63 +17,13 @@ class ErrorSignDetector():
         self.image = Image(file)
         self.hough_circles = HoughCirclesDetector(self.image)
         self.viola_jones = ViolaJonesDetector(self.image)
-        self.objects, self.unsuccessful_circles = self.calculate_objects()
+        self.objects, self.unsuccessful_circles = self.calculate_circles()
+        
+        if self.unsuccessful_circles:
+            self.colour_line = ColourLineDetector(self.image, self.unsuccessful_circles)
+            self.objects += self.colour_line.colour_circles
 
-        for x1, y1, w1, h1, in self.unsuccessful_circles:
-        # for x1, y1, w1, h1, in self.hough_circles.boxes:
-            y1_fitted = max(y1, 0)
-            x1_fitted = max(x1, 0)
-            h1_fitted = min(h1, self.image.height - y1)
-            w1_fitted = min(w1, self.image.width - x1)
-            
-            new_image = self.image.image[y1_fitted:y1_fitted + h1_fitted, x1_fitted:x1_fitted + w1_fitted][:]
-            new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
-
-            radius = int(w1 / 2)
-            centre = (int(w1 / 2), int(w1 / 2))
-            points_in_circle = []
-            for y2 in range(h1_fitted):
-                for x2 in range(w1_fitted):
-                    if self.distance(x2, y2, *centre) > radius - int(w1 / 20):
-                        new_image[y2][x2] = (0, 0, 0)
-                    else:
-                        points_in_circle.append(list(new_image[y2][x2]))
-            
-            points_in_circle = np.array(points_in_circle)
-
-            ab = points_in_circle[:, 1:]
-
-            kmeans = KMeans(n_clusters = 2)
-            kmeans.fit(ab)
-            
-            # new_image_clustered = np.zeros(new_image.shape)
-            # image_prediction = kmeans.predict(new_image.reshape((w1 * h1, 3))[:, 1:]).reshape(w1, h1)
-            # new_image_clustered[image_prediction == 0] = np.hstack([100, kmeans.cluster_centers_[0]])
-            # new_image_clustered[image_prediction == 1] = np.hstack([100, kmeans.cluster_centers_[1]])
-            # new_image_clustered = new_image_clustered.astype(np.uint8)
-            # cv2.imshow("", cv2.cvtColor(new_image_clustered, cv2.COLOR_LAB2BGR))
-            # cv2.waitKey()
-
-            red_index = np.argmax(kmeans.cluster_centers_.sum(axis = 1))
-            red = kmeans.cluster_centers_[red_index]
-            white = kmeans.cluster_centers_[np.abs(red_index - 1)]
-
-            print("red", red)
-            print("white", white)
-
-            ab_clustered = kmeans.predict(ab)
-            red_count = np.count_nonzero(ab_clustered == red_index)
-            white_count = np.count_nonzero(ab_clustered == np.abs(red_index - 1))
-
-            if self.distance(*red, 208, 193) < 65 and self.distance(*white, 128, 128) < 15 and red_count > white_count:
-            # if red[0] - red[1] > -10 and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20 and red_count > white_count:
-                print("YES")
-                self.objects.append((x1, y1, w1, h1))
-                cv2.rectangle(self.image.image, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
-            else:
-                print("NO")
-
-    def calculate_objects(self):
+    def calculate_circles(self):
         successful_intersections = []
         unsuccessful_intersections = []
         for x1, y1, w1, h1 in self.hough_circles.boxes:
@@ -207,7 +156,53 @@ class ViolaJonesDetector():
             maxSize = (300, 300)
         )   
 
-# class ColourDetector():
+class ColourLineDetector():
+    def __init__(self, image, circles):
+        self.image = image
+        self.circles = circles
+        self.colour_circles = self.calculate_colour_circles()
+        
+    def fit_range(self, x, y, w, h):
+        return max(x, 0), max(y, 0), min(w, self.image.width - x), min(h, self.image.height - y)
+
+    def distance(self, x1, y1, x2, y2):
+        return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+    def calculate_circle(self, w, h_fitted, w_fitted, new_image):
+        new_image_lab = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
+        radius = int(w / 2)
+        centre = (radius, radius)
+        points_in_circle = []
+        for y in range(h_fitted):
+            for x in range(w_fitted):
+                if self.distance(x, y, *centre) <= radius - int(w / 20):
+                    points_in_circle.append(list(new_image_lab[y][x]))
+        return np.array(points_in_circle)[:, 1:]
+
+    def calculate_red_white(self, ab):
+        kmeans = KMeans(n_clusters = 2)
+        kmeans.fit(ab)
+        red_index = np.argmax(kmeans.cluster_centers_.sum(axis = 1))
+        red = kmeans.cluster_centers_[red_index]
+        white = kmeans.cluster_centers_[np.abs(red_index - 1)]
+        ab_clustered = kmeans.predict(ab)
+        red_count = np.count_nonzero(ab_clustered == red_index)
+        white_count = np.count_nonzero(ab_clustered == np.abs(red_index - 1))
+        return red, white, red_count, white_count
+
+    def calculate_colour_circles(self):
+        new_objects = []
+        for x, y, w, h, in self.circles:
+            x_fitted, y_fitted, w_fitted, h_fitted = self.fit_range(x, y, w, h)
+
+            new_image = self.image.image[y_fitted:y_fitted + h_fitted, x_fitted:x_fitted + w_fitted]
+            points_in_circle_ab = self.calculate_circle(w, h_fitted, w_fitted, new_image)
+
+            red, white, red_count, white_count = self.calculate_red_white(points_in_circle_ab)
+
+            if self.distance(*red, 208, 193) < 65 and self.distance(*white, 128, 128) < 15 and red_count > white_count:
+                new_objects.append((x, y, w, h))
+        return new_objects
 
 if __name__ == "__main__":
     detector = ErrorSignDetector(sys.argv[1])
