@@ -15,7 +15,8 @@ IOU_THRESHOLD = 0.5
 class ErrorSignDetector():
     def __init__(self, file):
         self.image = Image(file)
-        self.hough_circles = HoughCirclesDetector(self.image)
+        self.hough_details = HoughDetails(self.image)
+        self.hough_circles = HoughCirclesDetector(self.hough_details)
         self.viola_jones = ViolaJonesDetector(self.image)
         self.objects, self.unsuccessful_circles = self.calculate_circles()
         
@@ -79,7 +80,7 @@ class DistanceDetector():
     def distance(self, x1, y1, x2, y2):
         return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-class HoughCirclesDetector(DistanceDetector):
+class HoughDetails():
     def __init__(self, image):
         self.image = image
         self.dx = cv2.Sobel(self.image.grey, cv2.CV_64F, 1, 0, ksize = 3, scale = 1, delta = 0, borderType = cv2.BORDER_DEFAULT)
@@ -87,9 +88,6 @@ class HoughCirclesDetector(DistanceDetector):
         self.gradient_magnitude = np.sqrt(self.dx ** 2 + self.dy ** 2)
         self.gradient_direction = np.arctan2(self.dy, self.dx)
         self.gradient_magnitude_threshold = self.calculate_gradient_magnitude_threshold()
-        self.hough_space = self.calculate_hough_space()
-        self.circles = self.calculate_circles()
-        self.boxes = [(int(x - r - MINIMUM_RADIUS), int(y - r - MINIMUM_RADIUS), int((r + MINIMUM_RADIUS) * 2), int((r + MINIMUM_RADIUS) * 2)) for x, y, r, _ in self.circles]
 
     def calculate_gradient_magnitude_threshold(self):
         gradient_magnitude_threshold = self.gradient_magnitude.copy()
@@ -97,28 +95,35 @@ class HoughCirclesDetector(DistanceDetector):
         gradient_magnitude_threshold[gradient_magnitude_threshold >= T_S] = 255
         return gradient_magnitude_threshold
 
+class HoughCirclesDetector(DistanceDetector):
+    def __init__(self, hough_details):
+        self.hough_details = hough_details
+        self.hough_space = self.calculate_hough_space()
+        self.circles = self.calculate_circles()
+        self.boxes = [(int(x - r - MINIMUM_RADIUS), int(y - r - MINIMUM_RADIUS), int((r + MINIMUM_RADIUS) * 2), int((r + MINIMUM_RADIUS) * 2)) for x, y, r, _ in self.circles]
+
     def calculate_hough_space(self):
         radii = MAXIMUM_RADIUS - MINIMUM_RADIUS
-        hough_space = np.zeros((self.image.height, self.image.width, radii))
-        for x in range(self.image.height):
-            for y in range(self.image.width):
-                if self.gradient_magnitude_threshold[x][y] == 255:
+        hough_space = np.zeros((self.hough_details.image.height, self.hough_details.image.width, radii))
+        for x in range(self.hough_details.image.height):
+            for y in range(self.hough_details.image.width):
+                if self.hough_details.gradient_magnitude_threshold[x][y] == 255:
                     for r in range(radii):
-                        x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(self.gradient_direction[x][y]))
-                        y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(self.gradient_direction[x][y]))
-                        if x_0 > 0 and x_0 < self.image.height and y_0 > 0 and y_0 < self.image.width:
+                        x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(self.hough_details.gradient_direction[x][y]))
+                        y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(self.hough_details.gradient_direction[x][y]))
+                        if x_0 > 0 and x_0 < self.hough_details.image.height and y_0 > 0 and y_0 < self.hough_details.image.width:
                             hough_space[x_0][y_0][r] += 1
-                        x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(self.gradient_direction[x][y] + np.pi))
-                        y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(self.gradient_direction[x][y] + np.pi))
-                        if x_0 > 0 and x_0 < self.image.height and y_0 > 0 and y_0 < self.image.width:
+                        x_0 = int(x - (r + MINIMUM_RADIUS) * np.sin(self.hough_details.gradient_direction[x][y] + np.pi))
+                        y_0 = int(y - (r + MINIMUM_RADIUS) * np.cos(self.hough_details.gradient_direction[x][y] + np.pi))
+                        if x_0 > 0 and x_0 < self.hough_details.image.height and y_0 > 0 and y_0 < self.hough_details.image.width:
                             hough_space[x_0][y_0][r] += 1
         return hough_space
 
     def calculate_possible_circles(self):
         t_h = int(np.max(self.hough_space) * 0.5)
         circles = []
-        for y in range(self.image.height):
-            for x in range(self.image.width):
+        for y in range(self.hough_details.image.height):
+            for x in range(self.hough_details.image.width):
                 for r in range(MAXIMUM_RADIUS - MINIMUM_RADIUS):
                     if self.hough_space[y][x][r] >= t_h:
                         circles.append([x, y, r, self.hough_space[y][x][r]])
