@@ -47,9 +47,6 @@ class ErrorSignDetector():
     def distance(self, x1, y1, x2, y2):
         return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-    def distance_3d(self, x1, y1, z1, x2, y2, z2):
-        return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2)
-
     def draw_boxes(self):
         for x, y, w, h in self.objects:
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -62,8 +59,18 @@ class ErrorSignDetector():
 
         # for x1, y1, w1, h1, in self.unsuccessful_circles:
         for x1, y1, w1, h1, in self.hough_circles.boxes:
-            new_image = self.image.image[y1:y1 + h1, x1: x1 + w1][:]
+            if x1 < 0:
+                x1 = 0
+                w1 += x1
+            if y1 < 0:
+                y1 = 0
+                h1 += y1
+            if x1 + w1 > self.image.width:
+                w1 = self.image.width - x1 - 1
+            if y1 + h1 > self.image.height:
+                h1 = self.image.height - h1 - 1
 
+            new_image = self.image.image[y1:y1 + h1, x1: x1 + w1][:]
             new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
 
             radius = int(w1 / 2)
@@ -97,6 +104,11 @@ class ErrorSignDetector():
 
             print("red", red)
             print("white", white)
+
+            if red[0] > red[1] and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20:
+                print("YES")
+            else:
+                print("NO")
 
             cv2.imshow("", cv2.cvtColor(new_image_clustered, cv2.COLOR_LAB2BGR))
             
