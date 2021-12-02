@@ -264,7 +264,7 @@ The rationale behind this was as follows:
 
 \begin{table}[H]
   \begin{center}
-  \caption{TPRs and F\textsubscript{1} scores of the integrated implementation}\label{tab:shape}
+  \caption{TPRs and F\textsubscript{1} scores of the integrated implementation, and the differences compared to the Viola-Jones implementation}\label{tab:shape}
   \begin{tabular}{l | l l | l l} 
     \hline\hline
     &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
@@ -328,7 +328,36 @@ The rationale behind this was as follows:
 
 \section{Improving my detector}
 
-
+\begin{table}[H]
+  \begin{center}
+  \caption{TPRs and F\textsubscript{1} scores of the improved implementation and the differences compared to the previous implementation}\label{tab:shape}
+  \begin{tabular}{l | l l | l l} 
+    \hline\hline
+    &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
+    Image&TPR&F\textsubscript{1} Score&TPR&F\textsubscript{1} Score\\
+    \hline
+    \texttt{NoEntry0.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry1.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry2.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry3.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry4.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry5.jpg}&0.20&0.31&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry6.jpg}&0.50&0.67&+0.50&+0.67\\
+    \texttt{NoEntry7.jpg}&0.00&0.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry8.jpg}&0.43&0.60&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry9.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry10.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry11.jpg}&1.00&1.00&+0.50&+0.33\\
+    \texttt{NoEntry12.jpg}&0.38&0.55&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry13.jpg}&1.00&1.00&+1.00&+1.00\\
+    \texttt{NoEntry14.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \texttt{NoEntry15.jpg}&1.00&1.00&$\pm0.00$&$\pm0.00$\\
+    \hdashline
+    All images&0.58&0.73&+0.08&+0.07\\
+    \hline
+  \end{tabular}
+  \end{center}
+\end{table} 
 
 \clearpage
 
