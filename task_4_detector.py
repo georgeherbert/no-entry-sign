@@ -1,6 +1,8 @@
 import sys
 import numpy as np
 import cv2
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
 MINIMUM_RADIUS = 10
 MAXIMUM_RADIUS = 110
@@ -16,10 +18,11 @@ class ErrorSignDetector():
         self.image = Image(file)
         self.hough_circles = HoughCirclesDetector(self.image)
         self.viola_jones = ViolaJonesDetector(self.image)
-        self.objects = self.calculate_objects()
+        self.objects, self.unsuccessful_circles = self.calculate_objects()
 
     def calculate_objects(self):
         successful_intersections = []
+        unsuccessful_intersections = []
         for x1, y1, w1, h1 in self.hough_circles.boxes:
             potential_intersections = []
             for x2, y2, w2, h2 in self.viola_jones.objects:
@@ -37,7 +40,9 @@ class ErrorSignDetector():
                 largest_intersection = max(potential_intersections, key = lambda x: x[1])
                 if largest_intersection[1] > IOU_THRESHOLD:
                     successful_intersections.append(largest_intersection[0])
-        return successful_intersections
+            if (x1, y1, w1, h1) not in successful_intersections:
+                unsuccessful_intersections.append((x1, y1, w1, h1))
+        return successful_intersections, unsuccessful_intersections
 
     def distance(self, x1, y1, x2, y2):
         return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -45,25 +50,49 @@ class ErrorSignDetector():
     def draw_boxes(self):
         for x, y, w, h in self.objects:
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # for x, y, r, _ in self.hough_circles.circles:
+        #     cv2.circle(self.image.image, (int(x), int(y)), int(r + MINIMUM_RADIUS), (0, 255, 255), 1)
+        cv2.imshow("", self.image.image)
+        cv2.waitKey()
         # for x, y, w, h in self.viola_jones.objects:
         #     cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (255, 255, 0), 1)
-        for x1, y1, w1, h1 in self.hough_circles.boxes:
+
+
+        # for x1, y1, w1, h1, in self.unsuccessful_circles:
+        for x1, y1, w1, h1, in self.hough_circles.boxes:
             new_image = self.image.image[y1:y1 + h1, x1: x1 + w1][:]
-            print(w1, h1, new_image.shape)
-            cv2.imshow("", new_image)
-            cv2.waitKey()
+            radius = int(w1 / 2)
+            centre = (int(w1 / 2), int(w1 / 2))
+            points_in_circle = []
+            for y2 in range(h1):
+                for x2 in range(w1):
+                    if self.distance(x2, y2, *centre) > radius - int(w1 / 20):
+                        new_image[y2][x2] = (0, 0, 0)
+                    else:
+                        points_in_circle.append(list(new_image[y2][x2]))
+            points_in_circle = np.array(points_in_circle)
 
-        # for x1, y1, r, _ in self.hough_circles.circles:
-        #     cv2.circle(self.image.image, (int(x1), int(y1)), int(r + MINIMUM_RADIUS), (0, 255, 255), 1)
-        #     for y2 in range(self.image.height):
-        #         for x2 in range(self.image.width):
-        #             # print(self.distance(x1, y1, x2, y2), r)
-        #             if self.distance(x1, y1, x2, y2) < r + MINIMUM_RADIUS:
-        #                 # print("Hello")
-        #                 print(self.image.image[y2][x2])
-        #                 self.image.image[y2][x2] = (0, 0, 255)
+            kmeans = KMeans(n_clusters = 2)
+            kmeans.fit(points_in_circle)
 
+            # fig = plt.figure()
+            # ax = fig.add_subplot(projection='3d')
+            # ax.scatter(points_in_circle[:, 0], points_in_circle[:, 1], points_in_circle[:, 2], c = kmeans.predict(points_in_circle))
+            # plt.show()
             
+            new_image_clustered = np.zeros((w1, h1, 3))
+
+            image_prediction = kmeans.predict(new_image.reshape(w1 * h1, 3)).reshape((w1, h1))
+            
+            # print(np.unique(image_prediction))
+
+            new_image_clustered[image_prediction == 0] = kmeans.cluster_centers_[0]
+            new_image_clustered[image_prediction == 1] = kmeans.cluster_centers_[1]
+            new_image_clustered = new_image_clustered.astype(np.uint8)
+            print(kmeans.cluster_centers_)
+            
+            cv2.imshow("", new_image_clustered)
+            cv2.waitKey()
 
     def normalise(self, image):
         image_normalised = 255 * (image - np.min(image)) / (np.max(image) - np.min(image))
