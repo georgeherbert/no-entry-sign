@@ -21,7 +21,7 @@ class ErrorSignDetector():
         self.objects, self.unsuccessful_circles = self.calculate_circles()
         
         if self.unsuccessful_circles:
-            self.colour_line = ColourLineDetector(self.image, self.unsuccessful_circles)
+            self.colour_line = ColourLineDetector(self.image, self.unsuccessful_circles, self.hough_details)
             self.objects += self.colour_line.colour_circles
 
     def calculate_circles(self):
@@ -62,11 +62,11 @@ class ErrorSignDetector():
 
     def save_images(self):
         cv2.imwrite("task_4_detector_output/1_image_grey.jpg", self.image.grey)
-        cv2.imwrite("task_4_detector_output/2_dx_display.jpg", self.normalise(self.hough_circles.dx))
-        cv2.imwrite("task_4_detector_output/3_dy_display.jpg", self.normalise(self.hough_circles.dy))
-        cv2.imwrite("task_4_detector_output/4_gradient_direction.jpg", self.normalise(self.hough_circles.gradient_direction))
-        cv2.imwrite("task_4_detector_output/5_gradient_magnitude.jpg", self.normalise(self.hough_circles.gradient_magnitude))
-        cv2.imwrite("task_4_detector_output/6_gradient_magnitude_threshold.jpg", self.hough_circles.gradient_magnitude_threshold)
+        cv2.imwrite("task_4_detector_output/2_dx_display.jpg", self.normalise(self.hough_circles.hough_details.dx))
+        cv2.imwrite("task_4_detector_output/3_dy_display.jpg", self.normalise(self.hough_circles.hough_details.dy))
+        cv2.imwrite("task_4_detector_output/4_gradient_direction.jpg", self.normalise(self.hough_circles.hough_details.gradient_direction))
+        cv2.imwrite("task_4_detector_output/5_gradient_magnitude.jpg", self.normalise(self.hough_circles.hough_details.gradient_magnitude))
+        cv2.imwrite("task_4_detector_output/6_gradient_magnitude_threshold.jpg", self.hough_circles.hough_details.gradient_magnitude_threshold)
         cv2.imwrite("task_4_detector_output/7_summed_hough_space.jpg", self.normalise(np.sum(self.hough_circles.hough_space, axis = 2)))
         cv2.imwrite("task_4_detector_output/8_output_image.jpg", self.image.image)
     
@@ -160,8 +160,9 @@ class ViolaJonesDetector():
         )   
 
 class ColourLineDetector(DistanceDetector):
-    def __init__(self, image, circles):
+    def __init__(self, image, circles, hough_details):
         self.image = image
+        self.hough_details = hough_details
         self.circles = circles
         self.colour_circles = self.calculate_colour_circles()
         
@@ -198,8 +199,65 @@ class ColourLineDetector(DistanceDetector):
             points_in_circle_ab = self.calculate_circle(w, h_fitted, w_fitted, new_image)
             red, white, red_count, white_count = self.calculate_red_white(points_in_circle_ab)
             if self.distance(*red, 208, 193) < 65 and self.distance(*white, 128, 128) < 15 and red_count > white_count:
-                new_objects.append((x, y, w, h))
+                lines = HoughLinesDetector(self.hough_details, x, y, w, h).lines
+                if len(lines) == 2:
+                    theta_0_abs = np.abs(lines[0][1])
+                    theta_1_abs = np.abs(lines[1][1])
+                    if theta_0_abs > 1.25 and theta_0_abs < 1.9 and theta_1_abs > 1.25 and theta_1_abs < 1.9 and np.abs(theta_0_abs - theta_1_abs) < 0.2:
+                        new_objects.append((x, y, w, h))
         return new_objects
+
+class HoughLinesDetector():
+    def __init__(self, hough_details, x, y, w, h):
+        self.hough_details = hough_details
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.image = self.hough_details.image.image[y:y + h, x: x + w]
+        self.gradient_direction = self.hough_details.gradient_direction[y:y + h, x: x + w]
+        self.gradient_magnitude_threshold = self.hough_details.gradient_magnitude_threshold[y:y + h, x:x + w]
+        self.rho_max = int(np.round(np.sqrt(self.w ** 2 + self.h ** 2)))
+        self.rhos = np.linspace(-self.rho_max, self.rho_max, self.rho_max * 2)
+        self.thetas = np.deg2rad(np.arange(-180, 180))
+        self.hough_space = self.calculate_hough_space()
+        self.lines = self.calculate_lines()
+
+    def calculate_hough_space(self):
+        hough_space = np.zeros((2 * self.rho_max, len(self.thetas)))
+        for y in range(self.h):
+            for x in range(self.w):
+                if self.gradient_magnitude_threshold[y][x]:
+                    for i, theta in enumerate(self.thetas):
+                        if theta > self.gradient_direction[y][x] - 0.005 and theta < self.gradient_direction[y][x] + 0.005:
+                            rho = x * np.cos(theta) + y * np.sin(theta)
+                            hough_space[int(rho) + self.rho_max][i] += 1
+        return hough_space
+
+    def calculate_possible_lines(self):
+        t_h = np.max(self.hough_space) * 0.5
+        lines = []
+        for i in range(self.rho_max * 2):
+            for j in range(len(self.thetas)):
+                if self.hough_space[i][j] > t_h:
+                    rho = self.rhos[i]
+                    theta = self.thetas[j]
+                    lines.append((rho, theta))
+        return lines
+
+    def calculate_lines(self):
+        possible_lines = self.calculate_possible_lines()
+        correct_lines = []
+        rho_threshold = self.rho_max / 10
+        theta_threshold = 0.1
+        for rho1, theta1 in possible_lines:
+            in_correct_lines = False
+            for rho2, theta2 in correct_lines:
+                if np.abs(rho1 - rho2) < rho_threshold and np.abs(theta1 - theta2) < theta_threshold:
+                    in_correct_lines = True
+            if not in_correct_lines:
+                correct_lines.append((rho1, theta1))
+        return correct_lines
 
 if __name__ == "__main__":
     detector = ErrorSignDetector(sys.argv[1])
