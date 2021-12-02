@@ -20,6 +20,60 @@ class ErrorSignDetector():
         self.viola_jones = ViolaJonesDetector(self.image)
         self.objects, self.unsuccessful_circles = self.calculate_objects()
 
+        for x1, y1, w1, h1, in self.unsuccessful_circles:
+        # for x1, y1, w1, h1, in self.hough_circles.boxes:
+            y1_fitted = max(y1, 0)
+            x1_fitted = max(x1, 0)
+            h1_fitted = min(h1, self.image.height - y1)
+            w1_fitted = min(w1, self.image.width - x1)
+            
+            new_image = self.image.image[y1_fitted:y1_fitted + h1_fitted, x1_fitted:x1_fitted + w1_fitted][:]
+            new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
+
+            radius = int(w1 / 2)
+            centre = (int(w1 / 2), int(w1 / 2))
+            points_in_circle = []
+            for y2 in range(h1_fitted):
+                for x2 in range(w1_fitted):
+                    if self.distance(x2, y2, *centre) > radius - int(w1 / 20):
+                        new_image[y2][x2] = (0, 0, 0)
+                    else:
+                        points_in_circle.append(list(new_image[y2][x2]))
+            
+            points_in_circle = np.array(points_in_circle)
+
+            ab = points_in_circle[:, 1:]
+
+            kmeans = KMeans(n_clusters = 2)
+            kmeans.fit(ab)
+            
+            # new_image_clustered = np.zeros(new_image.shape)
+            # image_prediction = kmeans.predict(new_image.reshape((w1 * h1, 3))[:, 1:]).reshape(w1, h1)
+            # new_image_clustered[image_prediction == 0] = np.hstack([100, kmeans.cluster_centers_[0]])
+            # new_image_clustered[image_prediction == 1] = np.hstack([100, kmeans.cluster_centers_[1]])
+            # new_image_clustered = new_image_clustered.astype(np.uint8)
+            # cv2.imshow("", cv2.cvtColor(new_image_clustered, cv2.COLOR_LAB2BGR))
+            # cv2.waitKey()
+
+            red_index = np.argmax(kmeans.cluster_centers_.sum(axis = 1))
+            red = kmeans.cluster_centers_[red_index]
+            white = kmeans.cluster_centers_[np.abs(red_index - 1)]
+
+            print("red", red)
+            print("white", white)
+
+            ab_clustered = kmeans.predict(ab)
+            red_count = np.count_nonzero(ab_clustered == red_index)
+            white_count = np.count_nonzero(ab_clustered == np.abs(red_index - 1))
+
+            if self.distance(*red, 208, 193) < 65 and self.distance(*white, 128, 128) < 15 and red_count > white_count:
+            # if red[0] - red[1] > -10 and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20 and red_count > white_count:
+                print("YES")
+                self.objects.append((x1, y1, w1, h1))
+                cv2.rectangle(self.image.image, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+            else:
+                print("NO")
+
     def calculate_objects(self):
         successful_intersections = []
         unsuccessful_intersections = []
@@ -52,66 +106,8 @@ class ErrorSignDetector():
             cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         # for x, y, r, _ in self.hough_circles.circles:
         #     cv2.circle(self.image.image, (int(x), int(y)), int(r + MINIMUM_RADIUS), (0, 255, 255), 1)
-        # cv2.imshow("", self.image.image)
-        # cv2.waitKey()
         # for x, y, w, h in self.viola_jones.objects:
         #     cv2.rectangle(self.image.image, (x, y), (x + w, y + h), (255, 255, 0), 1)
-
-        for x1, y1, w1, h1, in self.unsuccessful_circles:
-        # for x1, y1, w1, h1, in self.hough_circles.boxes:
-            y1_fitted = max(y1, 0)
-            x1_fitted = max(x1, 0)
-            h1_fitted = min(h1, self.image.height - y1)
-            w1_fitted = min(w1, self.image.width - x1)
-            
-            new_image = self.image.image[y1_fitted:y1_fitted + h1_fitted, x1_fitted:x1_fitted + w1_fitted][:]
-            new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2LAB)
-
-            radius = int(w1 / 2)
-            centre = (int(w1 / 2), int(w1 / 2))
-            points_in_circle = []
-            for y2 in range(h1_fitted):
-                for x2 in range(w1_fitted):
-                    if self.distance(x2, y2, *centre) > radius - int(w1 / 20):
-                        new_image[y2][x2] = (0, 0, 0)
-                    else:
-                        points_in_circle.append(list(new_image[y2][x2]))
-            
-            points_in_circle = np.array(points_in_circle)
-
-            ab = points_in_circle[:, 1:]
-
-            kmeans = KMeans(n_clusters = 2)
-            kmeans.fit(ab)
-            
-            # new_image_clustered = np.zeros((w1, h1, 3))
-
-            # image_prediction = kmeans.predict(new_image.reshape((w1 * h1, 3))[:, 1:]).reshape(w1, h1)
-
-            # new_image_clustered[image_prediction == 0] = np.hstack([100, kmeans.cluster_centers_[0]])
-            # new_image_clustered[image_prediction == 1] = np.hstack([100, kmeans.cluster_centers_[1]])
-            # new_image_clustered = new_image_clustered.astype(np.uint8)
-
-            red_index = np.argmax(kmeans.cluster_centers_.sum(axis = 1))
-            red = kmeans.cluster_centers_[red_index]
-            white = kmeans.cluster_centers_[np.abs(red_index - 1)]
-
-            print("red", red)
-            print("white", white)
-
-            ab_clustered = kmeans.predict(ab)
-            red_count = np.count_nonzero(ab_clustered == red_index)
-            white_count = np.count_nonzero(ab_clustered == np.abs(red_index - 1))
-
-            if red[0] > red[1] and red[0] > 144 and red[1] > 128 and self.distance(*white, 128, 128) < 20 and red_count > white_count:
-                print("YES")
-                self.objects.append((x1, y1, w1, h1))
-                cv2.rectangle(self.image.image, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
-            else:
-                print("NO")
-
-            # cv2.imshow("", cv2.cvtColor(new_image_clustered, cv2.COLOR_LAB2BGR))
-            # cv2.waitKey()
 
     def normalise(self, image):
         image_normalised = 255 * (image - np.min(image)) / (np.max(image) - np.min(image))
@@ -210,6 +206,8 @@ class ViolaJonesDetector():
             minSize = (10, 10),
             maxSize = (300, 300)
         )   
+
+# class ColourDetector():
 
 if __name__ == "__main__":
     detector = ErrorSignDetector(sys.argv[1])
