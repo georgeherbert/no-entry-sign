@@ -183,9 +183,6 @@ However, due to the slightly differing appearances of the no entry signs between
 Additionally, we are only testing our implementation on 16 images.
 To get a more accurate idea of the true TPR and F\textsubscript{1} score, we would need to test our implementation on a larger test set.
 
-
-
-
 \begin{table}[htbp]
   \begin{center}
   \caption{TPRs and F\textsubscript{1} scores of Viola-Jones no entry sign detector}\label{tab:vj}
@@ -339,18 +336,47 @@ They contain two colours: red and white; and they have a horizontal bar in the m
 To identify the main colours in each circle, my algorithm first transforms the colour space of the pixels within the circle from RGB to CIELAB.
 Since CIELAB uses perceptual brightness $L*$ as one of the values, my algoritm ignores this field and instead focus on the green-red axis $a*$ and the blue-yellow axis $b*$.
 This is an advantage since it enables my algorithm to identify the colours in the no entry signs, despite the lighting levels.
-My algorithm then performs K-means clustering on the $a*$ and $b*$ axes, to identify the two primary colours in each circle.
+My algorithm then performs $k$-means clustering on the $a*$ and $b*$ axes, to identify the two primary colours in each circle.
 Since CIELAB is designed to be perceptually uniform, my algorithm then calculates the Euclidean distance from pure white and pure red to the two cluster centers, to identify whether the primary colours in the circle were red and white.
 If the two primary colours are red and white, and there is more red in the circle than white, my algorithm then performs the line Hough transform on the circle.
 If the circle contains two approximately horizontal parallel lines, the circle is accepted as another positive no entry sign.
 
 \subsection{Visualise}
 
+\begin{figure}[H]
+  \vspace{-4.5em}
+  \centering
+  \subfloat[\texttt{NoEntry6.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_4_6.jpg}\label{fig:improved_image_6}}
+  \hfill
+  \subfloat[\texttt{NoEntry13.jpg} with detected bounding boxes]{\includegraphics[width = 0.24\textwidth]{images/task_4_13.jpg}\label{fig:improved_image_13}}
+  \hfill
+  \caption{Two no entry sign images with detected bounding boxes from my improved detector}\label{fig:improved_images}
+\end{figure}
+
+Figure \ref{fig:improved_images} exhibits the merit of my improved approach.
+All three detected bounding boxes were not identified by the previous detector.
+
+The two bounding boxes in Figure \ref{fig:improved_image_6} very clearly contain no entry signs.
+They are detected by the circle Hough transform but not the Viola-Jones detector.
+Therefore, my improved algorithm puts them through the extra stage of processing.
+First, the pixels are converted from RGB to LAB, and $k$-means is performed with $k = 2$.
+This very clearly identifies the two main colours.
+The merit of using $k$-means is very evident here: without it, the two main colours would not be able to be identified.
+To confirm the two main colours are red and white, the Euclidean distance is computed.
+Since they are, the detector looks for two horizontal parallel lines, which it finds, and therefore positively identifies the object as a no entry sign.
+The merit of using the line Hough transform is evident here: without it, any circles containing primary red and white would be a false positive.
+
+The no entry sign in Figure \ref{fig:improved_image_13} is clearly a no entry sign, but potentially due to the very low lighting it is not identified by the Viola-Jones detector.
+However, it is detected by the circle Hough transform and is therefore put through the extra stage of processing.
+Since I converted the colour space of the image to LAB, by focusing on the $a*$ and $b*$ axes and not the $L*$ perceptual brightness axis, my improved detector was still able to identify that the main colours in the circle were red and white.
+The merit of converting the colour space from RGB to LAB is evident here: by focusing purely on the $a*$ and $b*$ axes, no entry signs are able to be identified even in bad lighting conditions.
+By further confirming it contained two horizontal parallel lines, my detector was able to identify it as a no entry sign.
+
 \subsection{Evaluate}
 
 \begin{table}[htbp]
   \begin{center}
-  \caption{TPRs and F\textsubscript{1} scores of the improved implementation and the differences compared to the previous implementation}\label{tab:shape}
+  \caption{TPRs and F\textsubscript{1} scores of the improved implementation and the differences compared to the previous implementation}\label{tab:final}
   \begin{tabular}{l | l l | l l} 
     \hline\hline
     &\multicolumn{2}{| c |}{Result}&\multicolumn{2}{| c}{Difference}\\
@@ -377,7 +403,15 @@ If the circle contains two approximately horizontal parallel lines, the circle i
     \hline
   \end{tabular}
   \end{center}
-\end{table} 
+\end{table}
+
+Table \ref{tab:final} contains the TPR and F\textsubscript{1} scores of the improved detector.
+By putting detected circles that were not detected by the Viola-Jones detector through an extra stage or processing, the improved implementation was able to detect 8\% more no entry signs, and achieved a 7\% higher F\textsubscript{1} score.
+The key merits and shortcomings of the improved implementation include:
+\begin{itemize}
+  \item No entry signs that are facing the camera (i.e. circles) are identified almost always by the circle Hough transform, and by putting them through the extra stage of processing they are almost always correctly identified by looking for key characteristics
+  \item No entry signs that are not detected by the circle Hough transform cannot be detected no matter what; this includes no entry signs that are at an angle (and are therefore an ellipse) and no entry signs with a significant amount of occlusion
+\end{itemize}
 
 \clearpage
 
