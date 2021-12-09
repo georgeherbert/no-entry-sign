@@ -52,14 +52,14 @@
   \subfloat[\texttt{NoEntry7.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry7.jpg}\label{fig:face7}}
   \hfill
   \subfloat[\texttt{NoEntry11.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry11.jpg}\label{fig:face11}}
-  \caption{Six images with the ground truth bounding boxes in red and actually detected instances from \texttt{face.cpp} in green}\label{fig:face}
+  \caption{Six images with the ground truth bounding boxes in red and detected instances from \texttt{face.cpp} in green}\label{fig:face}
 \end{figure}
 
-Ground truth bounding boxes assist in determining the accuracy of a detection algorithm, and help to visualise how well it performs.
-Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the frontal faces detected by \texttt{face.cpp} in green.
-I defined the ground truth frontal faces as those whereby the majority of the face was visible, the person was facing the camera (i.e. both eyes visible) and the person was close enough for the major facial characteristics distinguishable.
+Ground truth bounding boxes assist in determining the accuracy of a detection algorithm and help visualise how well it performs.
+Figure \ref{fig:face} displays six images with ground truth bounding boxes in red and the frontal faces detected by \texttt{face.cpp} in green.
+I defined the ground truth frontal faces as those whereby the majority of the face was visible, the person was facing the camera (i.e. both eyes visible), and the person was close enough for the main facial characteristics to be distinguishable.
 
-\subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
+\subsection{Intersection-over-union, true positive rate and F\textsubscript{1} score}
 
 True positive rate (TPR) is a popular metric used to assess the performance of an object detection algorithm.
 The TPR is the proportion of objects that an algorithm is attempting to detect that are actually detected, and is given by the formula:
@@ -68,21 +68,20 @@ The TPR is the proportion of objects that an algorithm is attempting to detect t
 \]
 where TP is the number of true positives, and FN is the number of false negatives.
 
-The first practical difficulty that arises in calculating the TPR is whether or not to define a predicted bounding box as a being a true positive or a false positive.
-I opted to define a detected bounding box as being a true positive if it had an intersection-over-union (IOU) value greater than 0.5 with a ground truth bounding box, as this is considered a good score \cite{iou}.
+The first practical difficulty that arises in calculating the TPR is defining a predicted bounding box as a true positive or a false positive.
+I opted to define a detected bounding box as a true positive if it had an intersection-over-union (IOU) value greater than 0.5 with a ground truth bounding box, which is considered a good score \cite{iou}.
 For two bounding boxes $A$ and $B$, the IOU is calculated as follows:
 \[
   \textrm{IOU}(A, B) = \frac{|A \cap B|}{|A \cup B|}
 \]
 where $|A \cap B|$ is the area of intersection, and $|A \cup B|$ is the area of union.
-Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IOU value as being a true positive if there was more than one intersecting detected bounding box.
+Moreover, for each ground truth bounding box, I only defined the detected bounding box with the largest IOU value as a true positive if there was more than one intersecting detected bounding box.
 
-In any detection task, TPR can be a flawed metric to use to define how well a given model performs.
-This is because, firstly, the TPR can be usually be artificially increased simply by lowering the IOU threshold, without the model actually performing any better in reality.
-Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as being the object being detected, despite having a large number of false positives.
+In any detection task, TPR can be a flawed metric to define how well a given model performs; this is because, firstly, the TPR can usually be artificially increased simply by lowering the IOU threshold, without the model performing any better in reality.
+Secondly, it is possible to achieve a TPR of 100\% by detecting every possible pixel region as the object being detected, despite having many false positives.
 
-As a result of this, the F\textsubscript{1} score is often used as a measure of a model's accuracy.
-F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision (i.e. the proportion of predicted positives that are actually positive), and is calculated as follows:
+As a result of this, the F\textsubscript{1} score is often used to measure of a model's accuracy.
+F\textsubscript{1} score is the harmonic mean of recall (i.e. TPR) and precision (i.e. the proportion of predicted positives that are positive), and is calculated as follows:
 \[
   \textrm{F\textsubscript{1}} = \frac{\textrm{TP}}{\textrm{TP} + \frac{1}{2}(\textrm{FP} + \textrm{FN})}
 \]
@@ -119,7 +118,7 @@ where FP is the number of false positives.
 \end{table} 
 
 Table \ref{tab:face} displays the TPR and F\textsubscript{1} score that \texttt{face.cpp} achieved on each of the \texttt{NoEntry\textasteriskcentered.jpg} images.
-Due to the definitions of TPR and F\textsubscript{1} score, many of the values are undefined since division by zero yields an undefined result.
+Due to the TPR and F\textsubscript{1} score definitions, many of the values are undefined since division by zero yields an undefined result.
 
 \clearpage
 
@@ -158,11 +157,10 @@ I then used a variant of AdaBoost to train a no entry sign detector with these 5
   \caption{TPR and FPR of stages in the Viola-Jones no entry sign training process}\label{vj_training}
 \end{figure}
 
-During the training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
+The false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign during the training process.
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
-At each successive stage, the TPR remains at 100\%, while the FPR decreases drastically.
-This is because a cascade of more complex classifiers are produced at each successive stage.
-Therefore, the early stages involve only the less complex (but faster) classifiers and therefore have a larger FPR.
+The TPR remains at 100\% at each successive stage, while the FPR decreases drastically; this is because each successive stage produces a cascade of more complex classifiers.
+Therefore, the early stages involve only the less complex (but faster) classifiers and have a larger FPR.
  
 \subsection{Testing performance}
 
@@ -173,8 +171,22 @@ Therefore, the early stages involve only the less complex (but faster) classifie
   \subfloat[\texttt{NoEntry8.jpg}]{\includegraphics[width = 0.1695\textwidth]{images/task_2_8.jpg}\label{fig:task_2_8}}
   \hfill
   \subfloat[\texttt{NoEntry3.jpg}]{\includegraphics[width = 0.49\textwidth]{images/task_2_3.jpg}\label{fig:task_2_3}}
-  \caption{Three images with the ground truth bounding boxes in red and actually detected instances from the no entry sign detector in green}\label{fig:task_2}
+  \caption{Three images with the ground truth bounding boxes in red and detected instances from the no entry sign detector in green}\label{fig:task_2}
 \end{figure}
+
+Figure \ref{fig:task_2} contains three images with ground truth bounding boxes in red and detected bounding boxes from the Viola-Jones implementation in green.
+I defined the ground truth no entry signs as those whereby more than 50\% of the sign was visible.
+The implementation works relatively well, achieving a TPR of 0.44 and an F\textsubscript{1} score of 0.48, as shown in Table \ref{tab:vj}.
+However, the implementation has its shortcomings.
+When tested, the Viola-Jones implementation detected a large number of false positives.
+Upon inspection, this occurs in regions containing a slightly lighter strip horizontally between two darker strips.
+For example, Figure \ref{fig:task_2_3} contains a left turn sign incorrectly detected in this manner.
+
+The TPR on the test data is significantly lower than on the training data.
+One reason for this is likely due to the differing appearances of no entry signs in the test data.
+The Viola-Jones implementation was trained with a collection of artificial positives.
+This approach works best for completely rigid objects, which, due to the slightly differing appearances of the no entry signs between countries, the positives in our test images are not \cite{training}.
+Additionally, we are only testing our implementation on 16 images; we would ideally test our implementation on a more extensive test set to get a more accurate idea of the TPR and F\textsubscript{1} score
 
 \begin{table}[htbp]
   \begin{center}
@@ -206,20 +218,6 @@ Therefore, the early stages involve only the less complex (but faster) classifie
   \end{center}
 \end{table} 
 
-Figure \ref{fig:task_2} contains three images with ground truth bounding boxes in red, and detected bounding boxes from the Viola-Jones implementation in green.
-I defined the ground truth no entry signs as those whereby more than 50\% of the sign was visible.
-The implementation works relatively well, achieving a TPR of 0.44 and an F\textsubscript{1} score of 0.48, as shown in Table \ref{tab:vj}.
-However, the implementation has its shortcomings.
-When tested, the Viola-Jones implementation detected a large number of false positives.
-Upon inspection, this occurs in regions containing a slightly lighter strip horizontally between two darker strips.
-For example, the turn left sign in Figure \ref{fig:task_2_3} has been incorrectly detected in this manner.
-
-The TPR on the test data is significantly lower than on the training data.
-One reason for this is likely due to the differing appearances of no entry signs in the test data.
-The Viola-Jones implementation was trained with a collection of artificial positives.
-This approach works best for completely rigid objects, which, due to the slightly differing appearances of the no entry signs between countries, the positives in our test images are not \cite{training}.
-Additionally, we are only testing our implementation on 16 images; to get a more accurate idea of the TPR and F\textsubscript{1} score, we would ideally test our implementation on a larger test set.
-
 \clearpage
 
 \section{Integration with shape detectors}
@@ -245,14 +243,14 @@ Additionally, we are only testing our implementation on 16 images; to get a more
 
 \subsection{Evaluation}
 
-Table \ref{tab:shape} displays the TPR and F\textsubscript{1} score of the integrated implementation, as well as the differences compared with the Viola-Jones implementation.
+Table \ref{tab:shape} displays the TPR and F\textsubscript{1} score of the integrated implementation and the differences compared with the Viola-Jones implementation.
 The key merits and shortcomings include:
 \begin{itemize}
 \itemsep 0em 
-\item A significantly larger F\textsubscript{1} score, primarily as a result of increasing the precision; achieved by only defining an object detected by the Viola-Jones detector as positive if it has an IOU value with a  bounding box from the circle Hough transform greater than 50\%
-\item A small improvement to the TPR score, by reducing the minimum  number of neighbours allowing for more true positives to be identified (the extra false positives were `filtered out' by utilising the circle Hough transform)
+\item A significantly larger F\textsubscript{1} score, primarily as a result of increasing the precision; achieved by only defining an object detected by the Viola-Jones detector as positive if it has an IOU value with a  bounding box from the circle Hough Transform greater than 50\%
+\item A slight improvement to the TPR score, by reducing the minimum  number of neighbours allowing for more true positives to be identified (the extra false positives were `filtered out' by utilising the circle Hough Transform)
 \item If a no entry sign is positively detected by one of the detectors, but not the other, it is not positively detected by the integrated implementation
-\item A significantly slower implementation, since the circle Hough transform takes longer to calculate
+\item A significantly slower implementation, since the circle Hough Transform takes longer to calculate
 \end{itemize}
 
 \subsection{Detection pipeline}
@@ -261,9 +259,9 @@ Figure \ref{fig:flow} outlines the way I combined evidence in my algorithm.
 The rationale behind this was as follows:
 \begin{itemize}
 \itemsep 0em 
-\item The Viola-Jones detector detected 44\% of no entry signs, but had a low level of precision
+\item The Viola-Jones detector detected 44\% of no entry signs but had a low level of precision
 \item Upon inspection of the detected bounding boxes, it became clear the Viola-Jones detector appeared to be detecting regions with a light bar horizontally between two dark bars
-\item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IOU with a Viola-Jones bounding box of greater than 50\% (i.e. they are likely detecting the same object)
+\item Since no entry signs are circles, we could choose to detect the circles from the circle Hough Transform that have an IOU with a Viola-Jones bounding box of greater than 50\% (i.e. they are likely detecting the same object)
 \end{itemize}
 
 It is important to note that if multiple circles had an IOU greater than 50\% with a Viola-Jones detected bounding box, only the circle with the largest IOU was positively identified to avoid duplicate identifications of the same no entry sign.
@@ -304,7 +302,7 @@ It is important to note that if multiple circles had an IOU greater than 50\% wi
 \resizebox{0.45\textwidth}{!}{
 \begin{tikzpicture}[node distance = 1.25cm]
   \node (start) [startstop] {Start};
-  \node (hough) [process, below of = start] {Create set of bounding boxes of circles from the circle Hough transform};
+  \node (hough) [process, below of = start] {Create set of bounding boxes of circles from the circle Hough Transform};
   \node (vj) [process, right of = hough, xshift = 11.75em] {Create set of bounding boxes of no entry signs from Viola-Jones detector};
   \node (empty) [process, below of = vj, yshift = -0.6em] {Create empty list for positive no entry signs};
   \node (cartesian) [process, left of = empty, xshift = -11.75em] {Create cartesian product of bounding boxes from both sets};
@@ -327,7 +325,7 @@ It is important to note that if multiple circles had an IOU greater than 50\% wi
   \draw [arrow] (done) -- node[anchor = west] {Yes} (stop);
 \end{tikzpicture}
 }
-\caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough transform}
+\caption{Flow chart detailing my algorithm that integrates Viola-Jones with the circle Hough Transform}
 \label{fig:flow}
 \end{figure}
 
@@ -337,17 +335,17 @@ It is important to note that if multiple circles had an IOU greater than 50\% wi
 
 \subsection{Idea}
 
-My improved approach puts every circle detected by the circle Hough transform but not by the Viola-Jones detector through an extra stage of processing.
-The extra stage of processing begins by converting the colour space of the pixels within the circle from RGB to CIELAB.
+My improved approach puts every circle detected by the circle Hough Transform but not by the Viola-Jones detector through an extra processing stage.
+The extra stage of processing begins by converting the pixels' colour space within the circle from RGB to CIELAB.
 $K$-means is then performed with $k = 2$ over the green-red axis $a*$ and blue-yellow axis $b*$.
-The Euclidean distance is then calculated from the cluster centres to pure red and pure white, to idenify the two main colours in the circle.
-If the distances are less than a threshold (i.e. the two main colours are red and white), the line Hough transform is conduced on the circle to identify horizontal parallel lines.
+The Euclidean distance is then calculated from the cluster centres to pure red and pure white to identify the two main colours in the circle.
+If the distances are less than a threshold (i.e. the two main colours are red and white), the line Hough Transform is conducted on the circle to identify horizontal parallel lines.
 If horizontal parallel lines are detected, the circle is positively identified as a no entry sign.
 The rationale behind this was as follows:
 \begin{itemize}
-  \item The pixels are transformed from RGB to CIELAB so the $L*$ axis (i.e. the perceptual brightness axis) can be ignored when doing $k$-means, so that no entry signs under a variety of lighting conditions can be detected
+  \item The pixels are transformed from RGB to CIELAB so the $L*$ axis (i.e. the perceptual brightness axis) can be ignored when doing $k$-means, so that no entry signs under a variety of lighting conditions can be detected.
   \item Since CIELAB is perceptually uniform, by calculating the Euclidean distance, the algorithm can confirm whether the primary colours in the circle are red and white
-  \item By performing the line Hough transform, we can filter out all circles that contain red and white but are not no entry signs
+  \item By performing the line Hough Transform, we can filter out all circles that contain red and white but are not no entry signs
 \end{itemize}
 
 \subsection{Visualise}
@@ -363,20 +361,20 @@ The rationale behind this was as follows:
 \end{figure}
 
 Figure \ref{fig:improved_images} exhibits the merit of my improved approach.
-All three detected bounding boxes were not identified by the previous detector.
+The previous detector did not identify any of the detected bounding boxes.
 
 The two bounding boxes in Figure \ref{fig:improved_image_6} very clearly contain no entry signs.
-They are detected by the circle Hough transform but not the Viola-Jones detector.
+They are detected by the circle Hough Transform but not the Viola-Jones detector.
 Therefore, my improved algorithm puts them through the extra stage of processing.
-A merit of using $k$-means is very evident here: it is able to detect the two main colours in the circles by finding the values of the cluster centres.
-A merit of using CIELAB is also very clear: since CIELAB is perceptually uniform, my improved detector is able to identify the two main colours as red and white by calculating the Euclidean distance.
-A merit of using the line Hough tranform is that my algorithm is able to confirm that the circles are no entry signs by detecting two horizontal parallel lines.
-By using the line Hough transform we are able to eliminate false positives.
-Without it, my algorithm could identify any circle containing red and white as a no entry sign.
+A merit of using $k$-means is evident here: it can identify the two main colours in the circles by finding the values of the cluster centres.
+A merit of using CIELAB is also apparent: since CIELAB is perceptually uniform, my improved detector can identify the two main colours as red and white by calculating the Euclidean distance.
+A merit of using the line Hough Transform is that my algorithm can confirm that the circles are no entry signs by detecting two horizontal parallel lines.
+Therefore, my algorithm can eliminate false positives.
+Without it, my algorithm would identify any circle containing red and white as a no entry sign.
 
-The no entry sign in Figure \ref{fig:improved_image_13} is clearly a no entry sign, but potentially due to the very low lighting it is not identified by the Viola-Jones detector.
-However, it is detected by the circle Hough transform and is therefore put through the extra stage of processing.
-Another merit of converting the pixels from RGB to CIELAB is evident here: by focusing purely on the $a*$ and $b*$ axes, no entry sign is able to be identified, despite the poor lighting conditions.
+The no entry sign in Figure \ref{fig:improved_image_13} is clearly a no entry sign, but potentially due to the inadequate lighting, it is not identified by the Viola-Jones detector.
+However, it is detected by the circle Hough Transform and is therefore put through the extra processing stage.
+Another merit of converting the pixels from RGB to CIELAB is evident here: by focusing purely on the $a*$ and $b*$ axes, no entry sign can be identified, despite the poor lighting conditions.
 
 \subsection{Evaluate}
 
@@ -412,21 +410,20 @@ Another merit of converting the pixels from RGB to CIELAB is evident here: by fo
 \end{table}
 
 Table \ref{tab:final} contains the TPR and F\textsubscript{1} scores of the improved detector.
-By putting detected circles that were not detected by the Viola-Jones detector through an extra stage or processing, the improved implementation was able to detect 8\% more no entry signs, and achieved a 7\% higher F\textsubscript{1} score.
+By putting detected circles that were not detected by the Viola-Jones detector through an extra stage of processing, the improved implementation detected 8\% more no entry signs and achieved a 7\% higher F\textsubscript{1} score.
 The key merits and shortcomings of the improved implementation include:
 \begin{itemize}
-  \item No entry signs that are facing the camera (i.e. circles) are identified almost always by the circle Hough transform, and by putting them through the extra stage of processing they are almost always correctly identified by looking for key characteristics
-  \item No entry signs that are not detected by the circle Hough transform cannot be detected no matter what; this includes no entry signs that are at an angle (and are therefore an ellipse) and no entry signs with a significant amount of occlusion
+  \item No entry signs that are facing the camera (i.e. circles) are identified almost always by the circle Hough Transform, and by putting them through the extra stage of processing, they are almost always correctly identified by looking for key characteristics
+  \item No entry signs that are not detected by the circle Hough Transform cannot be detected no matter what; this includes no entry signs that are at an angle (and are therefore an ellipse) and no entry signs with a significant amount of occlusion
 \end{itemize}
 
 \subsection{Further Extensions}
 
-To further improve my detector, I could do the following:
-
-\begin{itemize}
-  \item Using the ellipse Hough transform, no entry signs not directly facing the camera could be identified
-  \item I could train the Viola-Jones detector on real no entry signs rather than artificial positives; this would likely improve the TPR
-\end{itemize}
+There are several ways I could likely improve the TPR of my detector as an extension.
+Firstly, I could use the elliptical Hough Transform to detect entry signs not directly facing the camera.
+However, I opted not to do this since the elliptical Hough transform requires a five-dimensional space and is significantly more computationally expensive.
+Secondly, I could train the Viola-Jones detector on real no entry signs rather than artificial positives.
+Ultimately, I did not do this as it was not ƒeasible to collect and process the positive samples subject to the time constraint.
 
 \clearpage
 
