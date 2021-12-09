@@ -127,6 +127,9 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
 
 \subsection{Training performance}
 
+To train my own detector, I initially generated a collection of 500 artificial $30 \times 30$ images of no entry signs by applying different perspective transformations to a base image.
+I then used a variant of AdaBoost to train a no entry sign detector with these 500 samples.
+
 \begin{figure}[h]
   \pgfplotstableread{
   0 1        1
@@ -155,9 +158,11 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
   \caption{TPR and FPR of stages in the Viola-Jones no entry sign training process}\label{vj_training}
 \end{figure}
 
-During the Viola-Jones no entry sign training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
+During the training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
 At each successive stage, the TPR remains at 100\%, while the FPR decreases drastically.
+This is because a cascade of more complex classifiers are produced at each successive stage.
+Therefore, the early stages involve only the weaker (but faster) classifiers and therefore have a larger FPR.
  
 \subsection{Testing performance}
 
@@ -168,7 +173,7 @@ At each successive stage, the TPR remains at 100\%, while the FPR decreases dras
   \subfloat[\texttt{NoEntry8.jpg}]{\includegraphics[width = 0.1695\textwidth]{images/task_2_8.jpg}\label{fig:task_2_8}}
   \hfill
   \subfloat[\texttt{NoEntry3.jpg}]{\includegraphics[width = 0.49\textwidth]{images/task_2_3.jpg}\label{fig:task_2_3}}
-  \caption{Three images with the bounding boxes of the ground truths in red and actually detected instances in green from the Viola-Jones no entry sign detector}\label{fig:task_2}
+  \caption{Three images with the ground truth bounding boxes in red and actually detected instances from the no entry sign detector in green}\label{fig:task_2}
 \end{figure}
 
 Figure \ref{fig:task_2} contains three images with ground truth bounding boxes in red, and detected bounding boxes from the Viola-Jones implementation in green.
@@ -180,7 +185,7 @@ For example, the turn left sign in Figure \ref{fig:task_2_3} has been incorrectl
 
 The TPR on the test data is significantly lower than on the training data.
 One reason for this is likely due to the differing appearances of no entry signs in the test data.
-The Viola-Jones implementation was trained using a single no entry sign with different perspective transformations applied to it to create a collection of artificial positives.
+The Viola-Jones implementation was trained with a collection of artificial positives.
 This approach works best for completely rigid objects \cite{training}. 
 However, due to the slightly differing appearances of the no entry signs between countries, the positives in our test images are not.
 Additionally, we are only testing our implementation on 16 images.
