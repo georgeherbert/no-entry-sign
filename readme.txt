@@ -6,7 +6,10 @@ python3 -m venv venv
 2. Start the virtual environment:
 source venv/bin/activate
 
-3. Install the required libraries:
+3. Upgrade pip:
+pip3 install --upgrade pip
+
+4. Install the required libraries:
 pip3 install -r requirements.txt
 
 --------------------------------------------------

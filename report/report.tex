@@ -157,7 +157,7 @@ I then used a variant of AdaBoost to train a no entry sign detector with these 5
   \caption{TPR and FPR of stages in the Viola-Jones no entry sign training process}\label{vj_training}
 \end{figure}
 
-The false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign during the training process.
+During the training process, the false positive rate (FPR) is the number of negatives incorrectly predicted as being a positive no entry sign.
 Figure \ref{vj_training} displays the TPR and FPR at each stage of the training process.
 The TPR remains at 100\% at each successive stage, while the FPR decreases drastically; this is because each successive stage produces a cascade of more complex classifiers.
 Therefore, the early stages involve only the less complex (but faster) classifiers and have a larger FPR.
