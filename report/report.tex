@@ -318,6 +318,7 @@ The rationale behind this was as follows:
   \draw [arrow] (cartesian) -- (for);
   \draw [arrow] (for) -- node[anchor = east, text width = 2cm] {\centering First\\combination} (iou);
   \draw [arrow] (iou) -- node[anchor = east] {Yes} (list);
+  \draw [arrow] (iou) -- node[anchor = north] {No} (done);
   \draw [arrow] (list.east) -| (done.west);
   \draw let \p1 = (done.north) in [thick,-] (done.north) -- node[anchor = west] {No} (\x1, -5.25);
   \draw let \p1 = (done.north), \p2 = (iou.north) in [arrow] (\x1, -5.25) -- node[anchor = north] {Next combination} (\x2, -5.25);
