@@ -266,6 +266,8 @@ The rationale behind this was as follows:
 \item Since no entry signs are circles, we could choose to detect the circles from the circle Hough transform that have an IOU with a Viola-Jones bounding box of greater than 50\% (i.e. they are likely detecting the same object)
 \end{itemize}
 
+It is important to note that if multiple circles had an IOU greater than 50\% with a Viola-Jones detected bounding box, only the circle with the largest IOU was positively identified to avoid duplicate identifications of the same no entry sign.
+
 \begin{table}[H]
   \begin{center}
   \caption{TPRs and F\textsubscript{1} scores of the integrated implementation, and the differences compared to the Viola-Jones implementation}\label{tab:shape}
@@ -335,19 +337,18 @@ The rationale behind this was as follows:
 
 \subsection{Idea}
 
-The motivation behind the new approach came from identifying the areas whereby the previous approach failed.
-There were several no entry signs that were visually quite clear (i.e. big, no occlusion, etc.), and were identified by the circle Hough transform, but since the Viola-Jones detector did not identify them, they were not positively identified.
-Therefore, to improve the detector, I took every circle rejected by the previous approach, and put them through an extra stage of processing.
-
-The extra stage of processing worked on the principal that every no entry sign shares similar characteristics.
-They contain two colours: red and white; and they have a horizontal bar in the middle.
-To identify the main colours in each circle, my algorithm first transforms the colour space of the pixels within the circle from RGB to CIELAB.
-Since CIELAB uses perceptual brightness $L*$ as one of the values, my algoritm ignores this field and instead focus on the green-red axis $a*$ and the blue-yellow axis $b*$.
-This is an advantage since it enables my algorithm to identify the colours in the no entry signs, despite the lighting levels.
-My algorithm then performs $k$-means clustering on the $a*$ and $b*$ axes, to identify the two primary colours in each circle.
-Since CIELAB is designed to be perceptually uniform, my algorithm then calculates the Euclidean distance from pure white and pure red to the two cluster centers, to identify whether the primary colours in the circle were red and white.
-If the two primary colours are red and white, and there is more red in the circle than white, my algorithm then performs the line Hough transform on the circle.
-If the circle contains two approximately horizontal parallel lines, the circle is accepted as another positive no entry sign.
+My improved approach puts every circle detected by the circle Hough transform but not by the Viola-Jones detector through an extra stage of processing.
+The extra stage of processing begins by converting the colour space of the pixels within the circle from RGB to CIELAB.
+$K$-means is then performed with $k = 2$ over the green-red axis $a*$ and blue-yellow axis $b*$.
+The Euclidean distance is then calculated from the cluster centres to pure red and pure white, to idenify the two main colours in the circle.
+If the distances are less than a threshold (i.e. the two main colours are red and white), the line Hough transform is conduced on the circle to identify horizontal parallel lines.
+If horizontal parallel lines are detected, the circle is positively identified as a no entry sign.
+The rationale behind this was as follows:
+\begin{itemize}
+  \item The pixels are transformed from RGB to CIELAB so the $L*$ axis (i.e. the perceptual brightness axis) can be ignored when doing $k$-means, so that no entry signs under a variety of lighting conditions can be detected
+  \item Since CIELAB is perceptually uniform, by calculating the Euclidean distance, the algorithm can confirm whether the primary colours in the circle are red and white
+  \item By performing the line Hough transform, we can filter out all circles that contain red and white but are not no entry signs
+\end{itemize}
 
 \subsection{Visualise}
 
@@ -367,18 +368,15 @@ All three detected bounding boxes were not identified by the previous detector.
 The two bounding boxes in Figure \ref{fig:improved_image_6} very clearly contain no entry signs.
 They are detected by the circle Hough transform but not the Viola-Jones detector.
 Therefore, my improved algorithm puts them through the extra stage of processing.
-First, the pixels are converted from RGB to LAB, and $k$-means is performed with $k = 2$.
-This very clearly identifies the two main colours.
-The merit of using $k$-means is very evident here: without it, the two main colours would not be able to be identified.
-To confirm the two main colours are red and white, the Euclidean distance is computed.
-Since they are, the detector looks for two horizontal parallel lines, which it finds, and therefore positively identifies the object as a no entry sign.
-The merit of using the line Hough transform is evident here: without it, any circles containing primary red and white would be a false positive.
+A merit of using $k$-means is very evident here: it is able to detect the two main colours in the circles by finding the values of the cluster centres.
+A merit of using CIELAB is also very clear: since CIELAB is perceptually uniform, my improved detector is able to identify the two main colours as red and white by calculating the Euclidean distance.
+A merit of using the line Hough tranform is that my algorithm is able to confirm that the circles are no entry signs by detecting two horizontal parallel lines.
+By using the line Hough transform we are able to eliminate false positives.
+Without it, my algorithm could identify any circle containing red and white as a no entry sign.
 
 The no entry sign in Figure \ref{fig:improved_image_13} is clearly a no entry sign, but potentially due to the very low lighting it is not identified by the Viola-Jones detector.
 However, it is detected by the circle Hough transform and is therefore put through the extra stage of processing.
-Since I converted the colour space of the image to LAB, by focusing on the $a*$ and $b*$ axes and not the $L*$ perceptual brightness axis, my improved detector was still able to identify that the main colours in the circle were red and white.
-The merit of converting the colour space from RGB to LAB is evident here: by focusing purely on the $a*$ and $b*$ axes, no entry signs are able to be identified even in bad lighting conditions.
-By further confirming it contained two horizontal parallel lines, my detector was able to identify it as a no entry sign.
+Another merit of converting the pixels from RGB to CIELAB is evident here: by focusing purely on the $a*$ and $b*$ axes, no entry sign is able to be identified, despite the poor lighting conditions.
 
 \subsection{Evaluate}
 
@@ -419,6 +417,15 @@ The key merits and shortcomings of the improved implementation include:
 \begin{itemize}
   \item No entry signs that are facing the camera (i.e. circles) are identified almost always by the circle Hough transform, and by putting them through the extra stage of processing they are almost always correctly identified by looking for key characteristics
   \item No entry signs that are not detected by the circle Hough transform cannot be detected no matter what; this includes no entry signs that are at an angle (and are therefore an ellipse) and no entry signs with a significant amount of occlusion
+\end{itemize}
+
+\subsection{Further Extensions}
+
+To further improve my detector, I could do the following:
+
+\begin{itemize}
+  \item Using the ellipse Hough transform, no entry signs not directly facing the camera could be identified
+  \item I could train the Viola-Jones detector on real no entry signs rather than artificial positives; this would likely improve the TPR
 \end{itemize}
 
 \clearpage
