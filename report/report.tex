@@ -52,11 +52,12 @@
   \subfloat[\texttt{NoEntry7.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry7.jpg}\label{fig:face7}}
   \hfill
   \subfloat[\texttt{NoEntry11.jpg}]{\includegraphics[width = 0.24\textwidth]{images/NoEntry11.jpg}\label{fig:face11}}
-  \caption{Six images with the bounding boxes of the ground truths in red and actually detected instances in green from the frontal face detector}\label{fig:face}
+  \caption{Six images with the ground truth bounding boxes in red and actually detected instances from \texttt{face.cpp} in green}\label{fig:face}
 \end{figure}
 
-In an object detection task, ground truth bounding boxes assist in determining the accuracy of the detection algorithm, and help to visualise how well it performs.
-Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the frontal faces detected by \texttt{face.cpp}, which implements the Viola-Jones object detection framework, in green.
+Ground truth bounding boxes assist in determining the accuracy of a detection algorithm, and help to visualise how well it performs.
+Figure \ref{fig:face} displays six images, with their ground truth bounding boxes in red, and the frontal faces detected by \texttt{face.cpp} in green.
+I defined the ground truth frontal faces as those whereby the majority of the face was visible, the person was facing the camera (i.e. both eyes visible) and the person was close enough for the major facial characteristics distinguishable.
 
 \subsection{Intersection-over-union, true positve rate and F\textsubscript{1} score}
 
@@ -110,6 +111,8 @@ where FP is the number of false positives.
     \texttt{NoEntry13.jpg}&Undefined&0.00\\ 
     \texttt{NoEntry14.jpg}&Undefined&0.00\\ 
     \texttt{NoEntry15.jpg}&Undefined&0.00\\ 
+    \hdashline
+    All images&0.52&0.15\\ 
     \hline
   \end{tabular}
   \end{center}
@@ -144,8 +147,8 @@ Due to the definitions of TPR and F\textsubscript{1} score, many of the values a
     xtick = data,
     xticklabels = {0, 1, 2},
   ]
-  \addplot[draw=black,fill=green!50] table[x index=0,y index=1] \dataset; %ano de 2013-2014
-  \addplot[draw=black,fill=red!50] table[x index=0,y index=2] \dataset; %ano de 2012-2013
+  \addplot[draw = black, fill = green!50] table[x index = 0,y index = 1] \dataset;
+  \addplot[draw = black, fill = red!50] table[x index = 0,y index = 2] \dataset;
   \legend{TPR, FPR}
   \end{axis}
   \end{tikzpicture}
