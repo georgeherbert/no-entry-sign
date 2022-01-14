@@ -6,7 +6,7 @@
 
 The coursework instructions are in the file [instructions.pdf](instructions.pdf).
 
-The file name of a bitmap image file is inputted to the program. The program then identifies no entry signs in the image file, draws bounding boxes, and saves the image with bounding boxes to detected.jpg.
+The program takes the location of a bitmap image file (BMP) as input to the program. The program then identifies no entry signs in the image file, draws bounding boxes, and saves the image with bounding boxes to detected.jpg.
 
 The coursework report is in the file [report.pdf](report/report.pdf).
 
